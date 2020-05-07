@@ -17,18 +17,27 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.provider.MediaStore;
 import android.content.ActivityNotFoundException;
+import android.os.Environment;
+import androidx.core.content.FileProvider;
+import androidx.core.app.AppComponentFactory;
+import android.os.Environment;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class GraphicsEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageView resultImage; // обработанное изображение
-    private ImageView originalImage; // оригинальное изображение
+    public ImageView resultImage; // обработанное изображение
+    public ImageView originalImage; // оригинальное изображение
     static final int GALLERY_REQUEST = 1;
     static final int CAMERA_REQUEST = 2;
-    private Uri picUri;
-    private final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
+    final int PIC_CROP = 3;
+    private Uri photoURI;
+    private String mCurrentPhotoPath;
 
     Button menu; // выход в меню приложения
     Button filter; // наложение цветового фильтра
@@ -37,6 +46,8 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTitle("Graphics Editor");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphics_editor);
 
@@ -71,9 +82,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 break;
 
             case R.id.cameraButton:
-                // TODO Call camera with permission
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                dispatchTakePictureIntent();
                 break;
 
             case R.id.filterButton:
@@ -107,13 +116,87 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 break;
 
             case CAMERA_REQUEST:
-                if (resultCode == RESULT_OK && imageReturnedIntent.hasExtra("data")) {
-                    Bitmap bitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
-                    if (bitmap != null) {
-                        originalImage.setImageBitmap(bitmap);
-                    }
-                    break;
+                if (resultCode == RESULT_OK ) {
+                   // Bitmap thumbnailBitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                //    performCrop();
+                    originalImage.setImageURI(photoURI);
                 }
+                    break;
+
+            case PIC_CROP:
+                if (resultCode == RESULT_OK ) {
+                    Bundle extras = imageReturnedIntent.getExtras();
+                    // Получим кадрированное изображение
+                    Bitmap thePic = extras.getParcelable("data");
+                    // передаём его в ImageView
+                    originalImage.setImageBitmap(thePic);
+                }
+                break;
         }
+    }
+
+   /* private void performCrop(){
+        try {
+            // Намерение для кадрирования. Не все устройства поддерживают его
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            cropIntent.setDataAndType(picUri, "image/*");
+            cropIntent.putExtra("crop", "true");
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            cropIntent.putExtra("outputX", 256);
+            cropIntent.putExtra("outputY", 256);
+            cropIntent.putExtra("return-data", true);
+            startActivityForResult(cropIntent, PIC_CROP);
+        }
+        catch(ActivityNotFoundException e){
+            String errorMessage = "Извините, но ваше устройство не поддерживает кадрирование";
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }*/
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.provider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    private void handleSmallCameraPhoto(Intent intent) {
+        Bundle extras = intent.getExtras();
+        Bitmap mImageBitmap = (Bitmap)extras.get("data");
+        originalImage.setImageBitmap(mImageBitmap);
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 }
