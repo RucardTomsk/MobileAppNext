@@ -44,8 +44,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch(view.getId()) {
             case R.id.editorButton:
-                Intent intent = new Intent(MainActivity.this, GraphicsEditorActivity.class);
-                startActivity(intent);
+                final Intent editorIntent = new Intent(MainActivity.this, GraphicsEditorActivity.class);
+                startActivity(editorIntent);
                 break;
 
             default:

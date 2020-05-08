@@ -1,4 +1,3 @@
-// Непосредствено графический редактор
 package com.example.mobileapp;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
-import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,11 +14,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.provider.MediaStore;
-import android.content.ActivityNotFoundException;
 import android.os.Environment;
 import androidx.core.content.FileProvider;
-import androidx.core.app.AppComponentFactory;
-import android.os.Environment;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -32,60 +27,69 @@ import java.util.Date;
 public class GraphicsEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
     public ImageView resultImage; // обработанное изображение
-    public ImageView originalImage; // оригинальное изображение
     static final int GALLERY_REQUEST = 1;
     static final int CAMERA_REQUEST = 2;
-    private Uri photoURI;
+    private Uri sourceImageURI; // URI оригинального приложения
+    private Uri resultImageURI; // URI обработанного изображения
     private String mCurrentPhotoPath;
 
     Button menu; // выход в меню приложения
     Button filter; // наложение цветового фильтра
-    Button gallery; // выбор фотографии из приложения
-    Button camera; // открыть камеру
+    ImageButton gallery; // выбор фотографии из приложения
+    ImageButton camera; // открыть камеру
+
+    /* Инициализировать кнопки редактора.
+    Метод будет вызван, когда будет загружена фотография. */
+    private void initButtons() {
+        filter = (Button)findViewById(R.id.filterButton);
+        filter.setOnClickListener(this);
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTitle("Graphics Editor");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphics_editor);
 
         menu = (Button)findViewById(R.id.menuButton);
         menu.setOnClickListener(this);
 
-        /*filter = (Button)findViewById(R.id.filterButton);
-        filter.setOnClickListener(this);*/
-
-        gallery = (Button)findViewById(R.id.galleryButton);
+        gallery = (ImageButton)findViewById(R.id.galleryButton);
         gallery.setOnClickListener(this);
 
-        camera = (Button)findViewById(R.id.cameraButton);
+        camera = (ImageButton)findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
 
-        originalImage = (ImageView)findViewById(R.id.image);
+        resultImage = (ImageView)findViewById(R.id.image);
+        resultImage.setImageURI(resultImageURI);
     }
 
     @Override
     public void onClick(View view) {
         switch(view.getId()) {
             case R.id.menuButton:
-                Intent intent = new Intent (GraphicsEditorActivity.this, MainActivity.class);
-                startActivity(intent);
+                final Intent callEditorIntent = new Intent(GraphicsEditorActivity.this, MainActivity.class);
+                startActivity(callEditorIntent);
                 break;
 
             case R.id.galleryButton:
-                // TODO open phone gallery with permission
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+                initButtons();
                 break;
 
             case R.id.cameraButton:
                 dispatchTakePictureIntent();
+                initButtons();
                 break;
 
             case R.id.filterButton:
-                // TODO Call color filter algorithm
+                final Intent callFilterIntent = new Intent(GraphicsEditorActivity.this, FilterActivity.class);
+                callFilterIntent.putExtra("source", sourceImageURI);
+                callFilterIntent.putExtra("original", resultImageURI);
+                startActivity(callFilterIntent);
                 break;
 
             default:
@@ -101,10 +105,11 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
             case GALLERY_REQUEST:
                 if (resultCode == RESULT_OK) {
                     try {
-                        final Uri imageUri = imageReturnedIntent.getData();
-                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        sourceImageURI = imageReturnedIntent.getData();
+                        resultImageURI = sourceImageURI;
+                        final InputStream imageStream = getContentResolver().openInputStream(sourceImageURI);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        originalImage.setImageBitmap(selectedImage);
+                        resultImage.setImageBitmap(selectedImage);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -113,9 +118,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
             case CAMERA_REQUEST:
                 if (resultCode == RESULT_OK ) {
-                    originalImage.setImageURI(photoURI);
+                    resultImage.setImageURI(sourceImageURI);
                 }
                     break;
+
+            default:
+                break;
         }
     }
 
@@ -129,10 +137,11 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
             }
             if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(this,
+                sourceImageURI = FileProvider.getUriForFile(this,
                         "com.example.android.provider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                resultImageURI = sourceImageURI;
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, sourceImageURI);
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
