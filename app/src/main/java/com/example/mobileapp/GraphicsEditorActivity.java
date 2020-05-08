@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-
-import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,9 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
-import android.provider.MediaStore;
-import android.content.ActivityNotFoundException;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -26,9 +21,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     private ImageView resultImage; // обработанное изображение
     private ImageView originalImage; // оригинальное изображение
     static final int GALLERY_REQUEST = 1;
-    static final int CAMERA_REQUEST = 2;
-    private Uri picUri;
-    private final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
 
     Button menu; // выход в меню приложения
     Button filter; // наложение цветового фильтра
@@ -51,8 +43,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         camera = (Button)findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
-
-        originalImage = (ImageView)findViewById(R.id.image);
     }
 
     @Override
@@ -64,16 +54,17 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 break;
 
             case R.id.galleryButton:
-                // TODO open phone gallery with permission
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+                // TODO open phone gallery with permission
                 break;
 
-            case R.id.cameraButton:
+            case R.id.cameraButton:/*
+                Intent cameraIntent = new Intent(Intent.);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, CAMERA_REQUEST);*/
                 // TODO Call camera with permission
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
                 break;
 
             case R.id.filterButton:
@@ -82,38 +73,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
             default:
                 break;
-        }
-    }
-
-    //Обрабочик выбора действия из галлереи
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-
-        switch (requestCode) {
-            case GALLERY_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    try {
-                        //Получаем URI изображения, преобразуем его в Bitmap
-                        //объект и отображаем в элементе ImageView нашего интерфейса:
-                        final Uri imageUri = imageReturnedIntent.getData();
-                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        originalImage.setImageBitmap(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-
-            case CAMERA_REQUEST:
-                if (resultCode == RESULT_OK && imageReturnedIntent.hasExtra("data")) {
-                    Bitmap bitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
-                    if (bitmap != null) {
-                        originalImage.setImageBitmap(bitmap);
-                    }
-                    break;
-                }
         }
     }
 }
