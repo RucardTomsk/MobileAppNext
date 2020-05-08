@@ -138,12 +138,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         }
     }
 
-    private void handleSmallCameraPhoto(Intent intent) {
-        Bundle extras = intent.getExtras();
-        Bitmap mImageBitmap = (Bitmap)extras.get("data");
-        originalImage.setImageBitmap(mImageBitmap);
-    }
-
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";

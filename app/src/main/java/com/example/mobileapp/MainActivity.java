@@ -1,18 +1,30 @@
 package com.example.mobileapp;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import android.net.Uri;
-import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+
+import android.app.Activity;
 import android.graphics.BitmapFactory;
-import android.view.Menu;
+import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.provider.MediaStore;
+import android.content.ActivityNotFoundException;
+import android.os.Environment;
+import androidx.core.content.FileProvider;
+import androidx.core.app.AppComponentFactory;
+import android.os.Environment;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     //Объявляем используемые переменные:
@@ -20,6 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTitle("Menu");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
