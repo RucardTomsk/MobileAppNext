@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,17 +10,20 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
+
+import static java.lang.Math.min;
+import static java.lang.Math.toIntExact;
 
 public class FilterActivity extends AppCompatActivity implements OnClickListener {
 
-    // Первоначальное изображений, без изменений
-    private Uri sourceImageURI;
     // Изображение до наложения фильтра
     private Uri originalImageURI;
     // Изображение после наложения фильтра
@@ -29,9 +33,21 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
     Button redColor;
     Button greenColor;
     Button blueColor;
+    Button negative;
+    Button grey;
+    Button cancel;
+    Button apply;
 
     // Изображение
     ImageView resultImage;
+
+    // Получить Uri из Bitmap
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +55,11 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         setContentView(R.layout.activity_filter);
 
         // Получить изображение
-        sourceImageURI = getIntent().getParcelableExtra("source");
         originalImageURI = getIntent().getParcelableExtra("original");
         resultImageURI = originalImageURI;
 
         resultImage = (ImageView)findViewById(R.id.resultImage);
-        resultImage.setImageURI(originalImageURI);
+        resultImage.setImageURI(resultImageURI);
 
         // Инициализировать кнопки
         redColor = (Button)findViewById(R.id.redButton);
@@ -55,6 +70,18 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
         blueColor = (Button)findViewById(R.id.blueButton);
         blueColor.setOnClickListener(this);
+
+        negative = (Button)findViewById(R.id.negativeButton);
+        negative.setOnClickListener(this);
+
+        grey = (Button)findViewById(R.id.greyButton);
+        grey.setOnClickListener(this);
+
+        cancel = (Button)findViewById(R.id.cancelButton);
+        cancel.setOnClickListener(this);
+
+        apply = (Button)findViewById(R.id.applyButton);
+        apply.setOnClickListener(this);
     }
 
     // Наложить фильтр на изображение
@@ -77,21 +104,28 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
                 // Наложим фильтр
                 switch (color) {
                     case "red":
-                        pixelRed += 20;
-                        if (pixelRed > 255)
-                            pixelRed = 255;
+                        pixelRed = min(255, pixelRed + 25);
                         break;
 
                     case "green":
-                        pixelGreen += 20;
-                        if (pixelGreen > 255)
-                            pixelGreen = 255;
+                        pixelGreen = min(255, pixelGreen + 25);
                         break;
 
                     case "blue":
-                        pixelBlue += 20;
-                        if (pixelBlue > 255)
-                            pixelBlue = 255;
+                        pixelBlue = min(255, pixelBlue + 25);
+                        break;
+
+                    case "negative":
+                        pixelRed = 255 - pixelRed;
+                        pixelGreen = 255 - pixelGreen;
+                        pixelBlue = 255 - pixelBlue;
+                        break;
+
+                    case "grey":
+                        final int pixelGrey = (int)(pixelRed * 0.2126 + pixelGreen * 0.7152 + pixelBlue * 0.0722);
+                        pixelRed = pixelGrey;
+                        pixelGreen = pixelGrey;
+                        pixelBlue = pixelGrey;
                         break;
 
                     default:
@@ -105,9 +139,8 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
             }
         }
         // Отобразим изменения
-        Drawable resultDrawable = new BitmapDrawable(resultBitmap);
         resultImage.setImageBitmap(resultBitmap);
-        resultImageURI = Uri.parse(resultImage.toString());
+        resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
     }
 
     @Override
@@ -116,22 +149,20 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         switch (view.getId()) {
             // Применить изменения и выйти в редактор
             case R.id.applyButton:
-                Intent editorIntent = new Intent(FilterActivity.this,
+                Intent callEditorIntent = new Intent(FilterActivity.this,
                         GraphicsEditorActivity.class);
 
-                editorIntent.putExtra("source", sourceImageURI);
-                editorIntent.putExtra("result", resultImageURI);
-                startActivity(editorIntent);
+                callEditorIntent.putExtra("result", resultImageURI);
+                startActivity(callEditorIntent);
                 break;
 
             // Отменить изменения и выйти в редактор
             case R.id.cancelButton:
-                editorIntent = new Intent(FilterActivity.this,
+                callEditorIntent = new Intent(FilterActivity.this,
                         GraphicsEditorActivity.class);
 
-                editorIntent.putExtra("source", sourceImageURI);
-                editorIntent.putExtra("original", originalImageURI);
-                startActivity(editorIntent);
+                callEditorIntent.putExtra("result", originalImageURI);
+                startActivity(callEditorIntent);
                 break;
 
             // Применить синий фильтр
@@ -147,6 +178,15 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
             // Применить красный фильтр
             case R.id.redButton:
                 applyFilter("red");
+                break;
+
+            // Применить негатив
+            case R.id.negativeButton:
+                applyFilter("negative");
+                break;
+            // Применить серые тона
+            case R.id.greyButton:
+                applyFilter("grey");
                 break;
 
             default:

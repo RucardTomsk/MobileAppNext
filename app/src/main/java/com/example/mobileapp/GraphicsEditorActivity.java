@@ -29,7 +29,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     public ImageView resultImage; // обработанное изображение
     static final int GALLERY_REQUEST = 1;
     static final int CAMERA_REQUEST = 2;
-    private Uri sourceImageURI; // URI оригинального приложения
     private Uri resultImageURI; // URI обработанного изображения
     private String mCurrentPhotoPath;
 
@@ -52,6 +51,14 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphics_editor);
 
+        if (getIntent() != null) {
+            resultImageURI = getIntent().getParcelableExtra("result");
+            initButtons();
+        }
+
+        resultImage = (ImageView)findViewById(R.id.image);
+        resultImage.setImageURI(resultImageURI);
+
         menu = (Button)findViewById(R.id.menuButton);
         menu.setOnClickListener(this);
 
@@ -60,9 +67,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         camera = (ImageButton)findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
-
-        resultImage = (ImageView)findViewById(R.id.image);
-        resultImage.setImageURI(resultImageURI);
     }
 
     @Override
@@ -87,7 +91,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
             case R.id.filterButton:
                 final Intent callFilterIntent = new Intent(GraphicsEditorActivity.this, FilterActivity.class);
-                callFilterIntent.putExtra("source", sourceImageURI);
                 callFilterIntent.putExtra("original", resultImageURI);
                 startActivity(callFilterIntent);
                 break;
@@ -105,9 +108,8 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
             case GALLERY_REQUEST:
                 if (resultCode == RESULT_OK) {
                     try {
-                        sourceImageURI = imageReturnedIntent.getData();
-                        resultImageURI = sourceImageURI;
-                        final InputStream imageStream = getContentResolver().openInputStream(sourceImageURI);
+                        resultImageURI = imageReturnedIntent.getData();
+                        final InputStream imageStream = getContentResolver().openInputStream(resultImageURI);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                         resultImage.setImageBitmap(selectedImage);
                     } catch (FileNotFoundException e) {
@@ -118,7 +120,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
             case CAMERA_REQUEST:
                 if (resultCode == RESULT_OK ) {
-                    resultImage.setImageURI(sourceImageURI);
+                    resultImage.setImageURI(resultImageURI);
                 }
                     break;
 
@@ -137,11 +139,10 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
             }
             if (photoFile != null) {
-                sourceImageURI = FileProvider.getUriForFile(this,
+                resultImageURI = FileProvider.getUriForFile(this,
                         "com.example.android.provider",
                         photoFile);
-                resultImageURI = sourceImageURI;
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, sourceImageURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, resultImageURI);
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
