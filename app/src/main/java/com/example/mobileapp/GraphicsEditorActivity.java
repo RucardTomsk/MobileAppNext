@@ -40,7 +40,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     /* Инициализировать кнопки редактора.
     Метод будет вызван, когда будет загружена фотография. */
     private void initButtons() {
-        filter = (Button)findViewById(R.id.filterButton);
+        filter = findViewById(R.id.filterButton);
         filter.setOnClickListener(this);
 
         turn = (Button)findViewById(R.id.TurnButton);
@@ -57,16 +57,16 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
             initButtons();
         }
 
-        resultImage = (ImageView)findViewById(R.id.image);
+        resultImage = findViewById(R.id.image);
         resultImage.setImageURI(resultImageURI);
 
-        menu = (Button)findViewById(R.id.menuButton);
+        menu = findViewById(R.id.menuButton);
         menu.setOnClickListener(this);
 
-        gallery = (ImageButton)findViewById(R.id.galleryButton);
+        gallery = findViewById(R.id.galleryButton);
         gallery.setOnClickListener(this);
 
-        camera = (ImageButton)findViewById(R.id.cameraButton);
+        camera = findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
     }
 

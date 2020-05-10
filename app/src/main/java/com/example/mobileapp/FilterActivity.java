@@ -55,29 +55,29 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         originalImageURI = getIntent().getParcelableExtra("original");
         resultImageURI = originalImageURI;
 
-        resultImage = (ImageView)findViewById(R.id.resultImage);
+        resultImage = findViewById(R.id.resultImage);
         resultImage.setImageURI(resultImageURI);
 
         // Инициализировать кнопки
-        redColor = (Button)findViewById(R.id.redButton);
+        redColor = findViewById(R.id.redButton);
         redColor.setOnClickListener(this);
 
-        greenColor = (Button)findViewById(R.id.greenButton);
+        greenColor = findViewById(R.id.greenButton);
         greenColor.setOnClickListener(this);
 
-        blueColor = (Button)findViewById(R.id.blueButton);
+        blueColor = findViewById(R.id.blueButton);
         blueColor.setOnClickListener(this);
 
-        negative = (Button)findViewById(R.id.negativeButton);
+        negative = findViewById(R.id.negativeButton);
         negative.setOnClickListener(this);
 
-        grey = (Button)findViewById(R.id.greyButton);
+        grey = findViewById(R.id.greyButton);
         grey.setOnClickListener(this);
 
-        cancel = (Button)findViewById(R.id.cancelButton);
+        cancel = findViewById(R.id.cancelButton);
         cancel.setOnClickListener(this);
 
-        apply = (Button)findViewById(R.id.applyButton);
+        apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
        }
 
