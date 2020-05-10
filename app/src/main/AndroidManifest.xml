@@ -20,6 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".FilterActivity"></activity>
+        <activity android:name=".TurnActivity"></activity>
         <activity android:name=".GraphicsEditorActivity">
             <intent-filter>
                 <action android:name="android.media.action.IMAGE_CAPTURE" />
