@@ -1,13 +1,10 @@
 package com.example.mobileapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,11 +13,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.ByteArrayOutputStream;
-import java.net.URI;
 
 import static java.lang.Math.min;
-import static java.lang.Math.toIntExact;
 
 public class FilterActivity extends AppCompatActivity implements OnClickListener {
 
@@ -82,7 +79,7 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
         apply = (Button)findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
-    }
+       }
 
     // Наложить фильтр на изображение
     private void applyFilter(String color) {

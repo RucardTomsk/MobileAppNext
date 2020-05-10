@@ -1,26 +1,25 @@
 package com.example.mobileapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
-
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.provider.MediaStore;
-import android.os.Environment;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,6 +33,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
     Button menu; // выход в меню приложения
     Button filter; // наложение цветового фильтра
+    Button turn; // Поворот изображения
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
 
@@ -43,7 +43,8 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         filter = (Button)findViewById(R.id.filterButton);
         filter.setOnClickListener(this);
 
-
+        turn = (Button)findViewById(R.id.TurnButton);
+        turn.setOnClickListener(this);
     }
 
     @Override
@@ -93,6 +94,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 final Intent callFilterIntent = new Intent(GraphicsEditorActivity.this, FilterActivity.class);
                 callFilterIntent.putExtra("original", resultImageURI);
                 startActivity(callFilterIntent);
+                break;
+
+            case R.id.TurnButton:
+                final Intent callTurnIntent = new Intent(GraphicsEditorActivity.this, TurnActivity.class);
+                callTurnIntent.putExtra("original",resultImageURI);
+                startActivity(callTurnIntent);
                 break;
 
             default:
