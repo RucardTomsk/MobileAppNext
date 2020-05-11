@@ -3,11 +3,11 @@ package com.example.mobileapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,7 +15,10 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
 
 import static java.lang.Math.min;
 
@@ -39,11 +42,26 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
     ImageView resultImage;
 
     // Получить Uri из Bitmap
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+    public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
+        Uri uri = null;
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        // Calculate inSampleSize
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, 200, 400,
+                true);
+        File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
+        FileOutputStream out = openFileOutput(file.getName(),
+                Context.MODE_APPEND);
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        out.flush();
+        out.close();
+        //get absolute path
+        String realPath = file.getAbsolutePath();
+        File f = new File(realPath);
+        uri = Uri.fromFile(f);
+
+        return uri;
     }
 
     @Override
@@ -137,7 +155,11 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         }
         // Отобразим изменения
         resultImage.setImageBitmap(resultBitmap);
-        resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
+        try {
+            resultImageURI = bitmapToUriConverter(resultBitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

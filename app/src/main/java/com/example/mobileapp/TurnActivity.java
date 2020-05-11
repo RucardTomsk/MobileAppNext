@@ -3,11 +3,11 @@ package com.example.mobileapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,7 +16,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
 
 public class TurnActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -65,12 +68,26 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
       }
 
-    // Получить Uri из Bitmap
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+    public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
+        Uri uri = null;
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            // Calculate inSampleSize
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, 200, 400,
+                    true);
+            File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
+            FileOutputStream out = openFileOutput(file.getName(),
+                Context.MODE_APPEND);
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            //get absolute path
+            String realPath = file.getAbsolutePath();
+            File f = new File(realPath);
+            uri = Uri.fromFile(f);
+
+        return uri;
     }
 
     @Override
@@ -83,16 +100,19 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bMap =((BitmapDrawable)resultImage.getDrawable()).getBitmap();
                 resultImage.setScaleType(ImageView.ScaleType.MATRIX);   //required
                 matrix.postRotate(StartingDegree, resultImage.getDrawable().getBounds().width()/2, resultImage.getDrawable().getBounds().height()/2);
-                matrix.postScale(0.5f, 0.5f);
 
                 int newWidth = bMap.getWidth()/2;
                 int newHeight = bMap.getHeight()/2;
 
                 Bitmap bMapRotate = Bitmap.createBitmap(bMap, 0, 0, newWidth, newHeight, matrix, true);
 
-                resultImageURI = getImageUri(getApplicationContext(), bMapRotate);
+                try {
+                    resultImageURI = bitmapToUriConverter(bMapRotate);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-              //  resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
+                //  resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
 
                 callEditorIntent.putExtra("result", resultImageURI);
                 startActivity(callEditorIntent);
