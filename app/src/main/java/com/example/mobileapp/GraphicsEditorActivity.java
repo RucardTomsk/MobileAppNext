@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -36,6 +37,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button turn; // Поворот изображения
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
+    Bitmap bitmap;
 
     /* Инициализировать кнопки редактора.
     Метод будет вызван, когда будет загружена фотография. */
@@ -47,12 +49,21 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         turn.setOnClickListener(this);
     }
 
+    private Bitmap SET(Bitmap bitmap){
+       // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
+        float aspectRetio = (float)bitmap.getHeight()/(float)bitmap.getWidth();
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int MImageWidth = displayMetrics.widthPixels;
+        int MImageHeight = (int)(MImageWidth*aspectRetio);
+        Bitmap MBitMap = Bitmap.createScaledBitmap(bitmap,MImageWidth,MImageHeight,false);
+        return MBitMap;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphics_editor);
 
-        if (getIntent() != null) {
+        if (getIntent().getParcelableExtra("result") != null) {
             resultImageURI = getIntent().getParcelableExtra("result");
             initButtons();
         }
@@ -68,6 +79,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         camera = findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
+
     }
 
     @Override

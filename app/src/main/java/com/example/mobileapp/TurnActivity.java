@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +19,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.sqrt;
 
 public class TurnActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
@@ -53,6 +57,8 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         resultImage = (ImageView) findViewById(R.id.resultImage);
         resultImage.setImageURI(originalImageURI);
+       // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
+
 
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
@@ -90,26 +96,65 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
         return uri;
     }
 
+    public Bitmap BitMapRotate(Bitmap bitmap, int degrees){
+        double rad = (degrees*3.14f)/180f;
+        double cosf = cos(rad);
+        double sinf = sqrt(1-cosf*cosf);
+
+        int newWidth = bitmap.getWidth();
+        int newHeight = bitmap.getHeight();
+
+        int x1 = (int)(-newHeight*sinf);
+        int y1 = (int)(newHeight*cosf);
+        int x2 = (int)(newWidth*cosf - newHeight*sinf);
+        int y2 = (int)(newHeight*cosf + newWidth*sinf);
+        int x3 = (int)(newWidth*cosf);
+        int y3 = (int)(newWidth*sinf);
+
+        int minX = min(0,min(x1,min(x2,x3)));
+        int minY = min(0,min(y1,min(y2,y3)));
+        int maxX = max(x1,max(x2,x3));
+        int maxY = max(y1,max(y2,y3));
+
+        int Width = maxX - minX;
+        int Height = maxY - minY;
+
+        Bitmap newBitMap = Bitmap.createBitmap(Width,Height,bitmap.getConfig());
+
+        for(int y = 0; y < Height; y++){
+            for(int x = 0; x < Width; x++){
+                int sourceX = (int)((x + minX)*cosf + (y+minY)*sinf);
+                int sourceY = (int)((y+minY)*cosf - (x+minX)*sinf);
+                if(sourceX >= 0 && sourceX < newWidth && sourceY >= 0 && sourceY < newHeight)
+                    newBitMap.setPixel(x,y,bitmap.getPixel(sourceX,sourceY));
+                else
+                    newBitMap.setPixel(x,y,0xffffff);
+            }
+        }
+        return newBitMap;
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.applyButton:
                 Intent callEditorIntent = new Intent(TurnActivity.this,
                         GraphicsEditorActivity.class);
-                Matrix matrix = new Matrix();
-                Bitmap bMap =((BitmapDrawable)resultImage.getDrawable()).getBitmap();
-                resultImage.setScaleType(ImageView.ScaleType.MATRIX);   //required
-                matrix.postRotate(StartingDegree, resultImage.getDrawable().getBounds().width()/2, resultImage.getDrawable().getBounds().height()/2);
-
-                int newWidth = bMap.getWidth()/2;
-                int newHeight = bMap.getHeight()/2;
-
-                Bitmap bMapRotate = Bitmap.createBitmap(bMap, 0, 0, newWidth, newHeight, matrix, true);
-
-                try {
-                    resultImageURI = bitmapToUriConverter(bMapRotate);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+                if(StartingDegree > 180) {
+                    imageBitmap = BitMapRotate(imageBitmap,180);
+                    try {
+                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree-180));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try {
+                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree-180));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 //  resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
