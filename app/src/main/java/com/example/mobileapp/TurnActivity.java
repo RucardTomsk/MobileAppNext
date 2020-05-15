@@ -128,7 +128,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                 if(sourceX >= 0 && sourceX < newWidth && sourceY >= 0 && sourceY < newHeight)
                     newBitMap.setPixel(x,y,bitmap.getPixel(sourceX,sourceY));
                 else
-                    newBitMap.setPixel(x,y,0xffffff);
+                    newBitMap.setPixel(x,y,0xc0c0c0);
             }
         }
         return newBitMap;
@@ -151,7 +151,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                 else
                 {
                     try {
-                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree-180));
+                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

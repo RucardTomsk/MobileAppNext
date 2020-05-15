@@ -35,6 +35,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button menu; // выход в меню приложения
     Button filter; // наложение цветового фильтра
     Button turn; // Поворот изображения
+    Button scaling; // Маштабирование
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
     Bitmap bitmap;
@@ -47,6 +48,9 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         turn = (Button)findViewById(R.id.TurnButton);
         turn.setOnClickListener(this);
+
+        scaling = (Button)findViewById(R.id.ScalingButton);
+        scaling.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
@@ -112,6 +116,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 final Intent callTurnIntent = new Intent(GraphicsEditorActivity.this, TurnActivity.class);
                 callTurnIntent.putExtra("original",resultImageURI);
                 startActivity(callTurnIntent);
+                break;
+
+            case R.id.ScalingButton:
+                final Intent callScalingIntent = new Intent(GraphicsEditorActivity.this, ScalingActivity.class);
+                callScalingIntent.putExtra("original",resultImageURI);
+                startActivity(callScalingIntent);
                 break;
 
             default:
