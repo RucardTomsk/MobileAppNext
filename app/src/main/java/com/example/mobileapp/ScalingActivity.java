@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
+
+import static java.lang.Math.floor;
 
 public class ScalingActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -90,7 +93,7 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
                 Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
                 int newW = (int)(imageBitmap.getWidth()*Cord);
                 int newH = (int)(imageBitmap.getHeight()*Cord);
-                Bitmap resultBitMap = resizeBilinearGray(imageBitmap, resultImage.getWidth(), resultImage.getHeight(), newW, newH);
+                Bitmap resultBitMap = resample(imageBitmap.getWidth(),imageBitmap.getHeight(),newW,newH,imageBitmap);
                 resultImage.setImageBitmap(resultBitMap);
                 try {
                     resultImageURI = bitmapToUriConverter(resultBitMap);
@@ -152,7 +155,7 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         int A, B, C, D, x, y, index, gray ;
         float x_ratio = ((float)(w-1))/w2 ;
         float y_ratio = ((float)(h-1))/h2 ;
-        float x_diff, y_diff, ya, yb ;
+        float x_diff, y_diff;
         int offset = 0 ;
         for (int i=0;i<h2;i++) {
             for (int j=0;j<w2;j++) {
@@ -162,17 +165,15 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
                 y_diff = (y_ratio * i) - y ;
                 index = y*w+x ;
 
-                A = pixels[index];
-                B = pixels[index+1];
-                C = pixels[index+w];
-                D = pixels[index+w+1];
+                A = pixels[index] + Color.BLACK;
+                B = pixels[index+1] + Color.BLACK;
+                C = pixels[index+w] + Color.BLACK;
+                D = pixels[index+w+1] + Color.BLACK;
 
                 // Y = A(1-w)(1-h) + B(w)(1-h) + C(h)(1-w) + Dwh
-                float xx = x*x;
-                gray = (int)(
-                        A*(1-x_diff)*(1-y_diff) +  B*(x_diff)*(1-y_diff) +
-                                C*(y_diff)*(1-x_diff)   +  D*(x_diff*y_diff) );
-
+                float c1 = A*(1.0f - x_diff) + B*x_diff;
+                float c2 = C*(1.0f - x_diff) + D*x_diff;
+                gray = (int)(c1*(1.0f - y_diff) + c2*y_diff);
                 temp[offset] = gray ;
                 offset++;
             }
@@ -212,4 +213,78 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         return uri;
     }
 
+   public Bitmap resample(int oldw, int oldh, int neww, int newh, Bitmap a_Bit)
+    {
+        int[][] a = new int[oldh][oldw];
+        for(int i = 0; i < oldh; i++){
+            for(int g = 0; g < oldw; g++){
+                a[i][g] = a_Bit.getPixel(g,i);
+            }
+        }
+
+        int i, j;
+        int h, w;
+        float t;
+        float u;
+        float tmp;
+        float d1, d2, d3, d4;
+        int p1, p2, p3, p4;	/* Окрестные пикселы */
+
+        int red, green, blue;
+        int[][] b = new int[newh][neww];
+        for (j = 0; j < newh; j++) {
+            tmp = (float) (j) / (float) (newh - 1) * (oldh - 1);
+            h = (int) floor(tmp);
+            if (h < 0) {
+                h = 0;
+            } else {
+                if (h >= oldh - 1) {
+                    h = oldh - 2;
+                }
+            }
+            u = tmp - h;
+
+            for (i = 0; i < neww; i++) {
+
+                tmp = (float) (i) / (float) (neww - 1) * (oldw - 1);
+                w = (int) floor(tmp);
+                if (w < 0) {
+                    w = 0;
+                } else {
+                    if (w >= oldw - 1) {
+                        w = oldw - 2;
+                    }
+                }
+                t = tmp - w;
+
+                /* Коэффициенты */
+                d1 = (1 - t) * (1 - u);
+                d2 = t * (1 - u);
+                d3 = t * u;
+                d4 = (1 - t) * u;
+
+                /* Окрестные пиксели: a[i][j] */
+                p1 = a[h][w];
+                p2 = a[h][w + 1];
+                p3 = a[h + 1][w + 1];
+                p4 = a[h + 1][w];
+
+                /* Компоненты */
+                blue = (int)(((p1 & 0xff)) * d1 + ((p2 & 0xff)) * d2 + (char) ((p3 & 0xff)) * d3 + ((p4 & 0xff)) * d4);
+                green = (int)(((p1 & 0xff00) >> 8) * d1 + ((p2 & 0xff00) >> 8) * d2 + (char) ((p3 & 0xff00) >> 8) * d3 + ((p4 & 0xff00)>> 8) * d4);
+                red = (int)(((p1 & 0xff0000) >> 16) * d1 + ((p2 & 0xff0000) >> 16) * d2 + (char) ((p3 & 0xff0000) >> 16) * d3 + ((p4 & 0xff0000)>> 16) * d4);
+
+                /* Новый пиксел из R G B  */
+                b[j][i] = 0xff000000 | (red << 16) |  (green << 8) | (blue);
+            }
+        }
+        Bitmap newBitMap = Bitmap.createBitmap(neww,newh, Bitmap.Config.ARGB_8888);
+
+        for(i = 0; i < newBitMap.getHeight(); i++){
+            for(int g = 0; g < newBitMap.getWidth(); g++){
+                newBitMap.setPixel(g,i,b[i][g]);
+            }
+        }
+        return newBitMap;
+    }
 }
