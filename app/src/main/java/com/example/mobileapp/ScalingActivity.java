@@ -4,18 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -199,7 +196,7 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         // Calculate inSampleSize
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
-        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, 200, 400,
+        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
                 true);
         File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
         FileOutputStream out = openFileOutput(file.getName(),

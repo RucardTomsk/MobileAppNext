@@ -1,15 +1,14 @@
 package com.example.mobileapp;
 
-import android.content.Intent;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     //Объявляем используемые переменные:
-    Button editor;
+    ImageButton editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

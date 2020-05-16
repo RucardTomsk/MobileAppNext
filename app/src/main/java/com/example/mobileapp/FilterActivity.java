@@ -48,7 +48,7 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         // Calculate inSampleSize
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
-        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, 200, 400,
+        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
                 true);
         File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
         FileOutputStream out = openFileOutput(file.getName(),
