@@ -58,8 +58,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         resultImage = (ImageView) findViewById(R.id.resultImage);
         resultImage.setImageURI(originalImageURI);
-       // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
-
+       // resultImage.animate().scaleX(resultImage.getDrawable();).getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
 
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
@@ -72,7 +71,6 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         apply = (Button)findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
-
       }
 
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
@@ -82,7 +80,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
             Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
-                    true);
+        true);
             File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
             FileOutputStream out = openFileOutput(file.getName(),
                 Context.MODE_APPEND);
@@ -141,7 +139,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                 Intent callEditorIntent = new Intent(TurnActivity.this,
                         GraphicsEditorActivity.class);
                 Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
-               if(StartingDegree >= 0 && StartingDegree <= 90)
+               if(StartingDegree >= 0 && StartingDegree < 90)
                 {
                     try {
                         resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree));
@@ -150,7 +148,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
-                   if(StartingDegree >= 90 && StartingDegree <=180) {
+                   if(StartingDegree >= 90 && StartingDegree <180) {
                            imageBitmap = BitMapRotate(imageBitmap, 90);
                            try {
                                resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree - 90));
@@ -159,7 +157,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                            }
                    }
 
-                   if (StartingDegree >= 180 && StartingDegree <= 270) {
+                   if (StartingDegree >= 180 && StartingDegree < 270) {
                            imageBitmap = BitMapRotate(imageBitmap, 90);
                            imageBitmap = BitMapRotate(imageBitmap, 90);
                            try {
@@ -202,7 +200,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-
+        resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
     }
 
     @Override

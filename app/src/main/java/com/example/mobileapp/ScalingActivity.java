@@ -139,58 +139,6 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public Bitmap resizeBilinearGray(Bitmap pixels_E, int w, int h, int w2, int h2) {
-        int[] pixels = new int[w*h];
-        int counter = 0;
-
-        for(int i = 0; i < pixels_E.getHeight(); i++){
-            for(int g = 0; g < pixels_E.getWidth(); g++){
-                pixels[counter] = pixels_E.getPixel(g,i);
-                counter++;
-            }
-        }
-
-        int[] temp = new int[w2*h2] ;
-        int A, B, C, D, x, y, index, gray ;
-        float x_ratio = ((float)(w-1))/w2 ;
-        float y_ratio = ((float)(h-1))/h2 ;
-        float x_diff, y_diff;
-        int offset = 0 ;
-        for (int i=0;i<h2;i++) {
-            for (int j=0;j<w2;j++) {
-                x = (int)(x_ratio * j) ;
-                y = (int)(y_ratio * i) ;
-                x_diff = (x_ratio * j) - x ;
-                y_diff = (y_ratio * i) - y ;
-                index = y*w+x ;
-
-                A = pixels[index] + Color.BLACK;
-                B = pixels[index+1] + Color.BLACK;
-                C = pixels[index+w] + Color.BLACK;
-                D = pixels[index+w+1] + Color.BLACK;
-
-                // Y = A(1-w)(1-h) + B(w)(1-h) + C(h)(1-w) + Dwh
-                float c1 = A*(1.0f - x_diff) + B*x_diff;
-                float c2 = C*(1.0f - x_diff) + D*x_diff;
-                gray = (int)(c1*(1.0f - y_diff) + c2*y_diff);
-                temp[offset] = gray ;
-                offset++;
-            }
-        }
-
-        Bitmap newBitMap = Bitmap.createBitmap(w2,h2,pixels_E.getConfig());
-        counter = 0;
-
-        for(int i = 0; i < newBitMap.getHeight(); i++){
-            for(int g = 0; g < newBitMap.getWidth(); g++){
-                newBitMap.setPixel(g,i,temp[counter]);
-                counter++;
-            }
-        }
-        return newBitMap;
-    }
-
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
         final BitmapFactory.Options options = new BitmapFactory.Options();

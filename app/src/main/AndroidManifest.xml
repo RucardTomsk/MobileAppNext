@@ -22,6 +22,7 @@
         <activity android:name=".FilterActivity"></activity>
         <activity android:name=".TurnActivity"></activity>
         <activity android:name=".ScalingActivity"></activity>
+        <activity android:name=".PaintActivity"></activity>
 
         <activity android:name=".GraphicsEditorActivity">
             <intent-filter>
