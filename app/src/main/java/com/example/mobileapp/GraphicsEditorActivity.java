@@ -37,6 +37,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button turn; // Поворот изображения
     Button scaling; // Маштабирование
     Button paint;
+    Button retouch;
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
     Bitmap bitmap;
@@ -52,6 +53,9 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         scaling = (Button)findViewById(R.id.ScalingButton);
         scaling.setOnClickListener(this);
+
+        retouch = findViewById(R.id.RetouchButton);
+        retouch.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
@@ -130,6 +134,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
             case R.id.PaintButton:
                 final Intent callPaintIntent = new Intent(GraphicsEditorActivity.this, PaintActivity.class);
                 startActivity(callPaintIntent);
+                break;
+
+            case R.id.RetouchButton:
+                final Intent callRetouchIntent = new Intent(GraphicsEditorActivity.this, RetouchActivity.class);
+                callRetouchIntent.putExtra("original",resultImageURI);
+                startActivity(callRetouchIntent);
                 break;
 
             default:
