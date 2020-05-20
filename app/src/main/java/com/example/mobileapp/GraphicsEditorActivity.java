@@ -38,6 +38,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button scaling; // Маштабирование
     Button paint;
     Button retouch;
+    Button segment;
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
     Bitmap bitmap;
@@ -56,6 +57,9 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         retouch = findViewById(R.id.RetouchButton);
         retouch.setOnClickListener(this);
+
+        segment = findViewById(R.id.segmentButton);
+        segment.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
@@ -140,6 +144,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 final Intent callRetouchIntent = new Intent(GraphicsEditorActivity.this, RetouchActivity.class);
                 callRetouchIntent.putExtra("original",resultImageURI);
                 startActivity(callRetouchIntent);
+                break;
+
+            case R.id.segmentButton:
+                final Intent callSegmentationIntent = new Intent(GraphicsEditorActivity.this, SegmentationActivity.class);
+                callSegmentationIntent.putExtra("original",resultImageURI);
+                startActivity(callSegmentationIntent);
                 break;
 
             default:

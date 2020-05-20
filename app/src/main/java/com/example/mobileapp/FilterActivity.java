@@ -116,12 +116,16 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
         Bitmap resultBitmap = Bitmap.createBitmap(imageBitmap.getWidth(),
                 imageBitmap.getHeight(), imageBitmap.getConfig());
-        float ProgresShift = 100/imageBitmap.getWidth();
-        for(int x = 0; x < imageBitmap.getWidth(); x++) {
-            for(int y = 0; y < imageBitmap.getHeight(); y++) {
+        final int width = imageBitmap.getWidth();
+        final int height = imageBitmap.getHeight();
+        float ProgressShift = 100/width;
+        int[] pixelArray = new int[width * height];
+        imageBitmap.getPixels(pixelArray, 0, width, 0, 0, width, height);
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
 
                 // Получим информацию о пикселе
-                int pixelColor = imageBitmap.getPixel(x, y);
+                int pixelColor = pixelArray[y * width + x];
                 int pixelAlpha = Color.alpha(pixelColor);
                 int pixelRed = Color.red(pixelColor);
                 int pixelGreen = Color.green(pixelColor);
@@ -162,11 +166,12 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
                 // Создадим новый пиксель и заменим им старый
                 int newPixel = Color.argb(pixelAlpha, pixelRed,
                         pixelGreen, pixelBlue);
-                resultBitmap.setPixel(x, y, newPixel);
+                pixelArray[y * width + x] = newPixel;
             }
             progressBar.incrementProgressBy(1);
-            progressText.setText(String.valueOf(progressBar.getProgress() + ProgresShift) + "%");
+            progressText.setText(String.valueOf(progressBar.getProgress() + ProgressShift) + "%");
         }
+        resultBitmap.setPixels(pixelArray, 0, width, 0, 0, width, height);
         // Отобразим изменения
         resultImage.setImageBitmap(resultBitmap);
         try {

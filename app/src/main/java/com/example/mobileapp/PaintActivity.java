@@ -29,7 +29,7 @@ import static java.lang.StrictMath.abs;
 
 public class PaintActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
-    ImageView rezultImage;
+    ImageView resultImage;
     TextView Text1, Text2;
     Bitmap newBitMap;
     Button build;
