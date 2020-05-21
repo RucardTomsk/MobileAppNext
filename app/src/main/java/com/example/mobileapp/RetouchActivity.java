@@ -117,7 +117,7 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void addArea(int x, int y) {
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 21; i++) {
             for (int j = 0; j < 21; j++) {
                 addPixel(x - 10 + i, y - 10 + j);
             }

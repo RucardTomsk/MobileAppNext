@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
 public class FilterActivity extends AppCompatActivity implements OnClickListener {
