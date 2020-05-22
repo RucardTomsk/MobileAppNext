@@ -202,8 +202,6 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        // Calculate inSampleSize
-        // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
                 true);
@@ -213,11 +211,11 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         out.flush();
         out.close();
-        //get absolute path
         String realPath = file.getAbsolutePath();
         File f = new File(realPath);
         uri = Uri.fromFile(f);
 
         return uri;
     }
+
 }

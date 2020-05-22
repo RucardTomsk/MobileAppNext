@@ -38,6 +38,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button scaling; // Маштабирование
     Button paint;
     Button unsharpmask;
+    Button retouth;
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
     Bitmap bitmap;
@@ -56,6 +57,9 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         unsharpmask = findViewById(R.id.UnsharpMaskButton);
         unsharpmask.setOnClickListener(this);
+
+        retouth = findViewById(R.id.RetouchButton);
+        retouth.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
@@ -88,9 +92,6 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         camera = findViewById(R.id.cameraButton);
         camera.setOnClickListener(this);
-
-        paint = findViewById(R.id.PaintButton);
-        paint.setOnClickListener(this);
     }
 
     @Override
@@ -131,16 +132,18 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 startActivity(callScalingIntent);
                 break;
 
-            case R.id.PaintButton:
-                final Intent callPaintIntent = new Intent(GraphicsEditorActivity.this, PaintActivity.class);
-                startActivity(callPaintIntent);
-                break;
-
             case R.id.UnsharpMaskButton:
                 final Intent callUnsharpIntent = new Intent(GraphicsEditorActivity.this, UnsharpMaskActivity.class);
                 callUnsharpIntent.putExtra("original", resultImageURI);
                 startActivity(callUnsharpIntent);
                 break;
+
+            case R.id.RetouchButton:
+                final Intent callRetouchIntent = new Intent(GraphicsEditorActivity.this, RetouchActivity.class);
+                callRetouchIntent.putExtra("original", resultImageURI);
+                startActivity(callRetouchIntent);
+                break;
+
             default:
                 break;
         }

@@ -3,9 +3,12 @@ package com.example.mobileapp;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.MotionEvent;
 import android.widget.Button;
@@ -33,16 +36,11 @@ import static java.lang.StrictMath.abs;
 public class PaintActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
     ImageView rezultImage;
-    TextView Text1, Text2;
     Bitmap newBitMap;
-    ImageButton build;
-    ImageButton flatten;
-    ImageButton cancel;
+    Button build;
+    Button flatten;
+    Button cancel;
     GraphView graphView;
-    ProgressBar progressBar;
-    TextView progressText;
-
-    Animation animAlpha;
 
 
     public static class V{
@@ -57,11 +55,6 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paint);
-
-        animAlpha = AnimationUtils.loadAnimation(this, R.anim.alpha);
-
-        Text1 = (TextView)findViewById(R.id.textView2);
-        Text2 = (TextView)findViewById(R.id.textView3);
 
         build = findViewById(R.id.BuildButton);
         build.setOnClickListener(this);
@@ -78,16 +71,12 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
         // set manual X bounds
         graphView.getViewport().setXAxisBoundsManual(true);
         graphView.getViewport().setMinX(0);
-        graphView.getViewport().setMaxX(11);
+        graphView.getViewport().setMaxX(10);
 
         // set manual Y bounds
         graphView.getViewport().setYAxisBoundsManual(true);
         graphView.getViewport().setMinY(0);
         graphView.getViewport().setMaxY(10);
-        graphView.setBackgroundColor(Color.WHITE);
-
-        progressBar = findViewById(R.id.progressBar);
-        progressText = findViewById(R.id.textView5);
 
     }
 
@@ -97,13 +86,9 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        progressBar.setVisibility(ProgressBar.VISIBLE);
-        progressText.setText(String.valueOf("0%"));
+
         switch (view.getId()) {
             case R.id.BuildButton:
-                build.startAnimation(animAlpha);
-                float ProgressShift = 100/mas.capacity();
-                float StartShift = 0;
                 V mas_3[] = new V[mas.capacity()];
 
 
@@ -135,15 +120,12 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
 
                         graphView.addSeries(series2);
                         series2.setShape(PointsGraphSeries.Shape.POINT);
-                        series2.setColor(Color.GRAY);
+                        series2.setColor(Color.WHITE);
                         series2.setSize(4);
-                        StartShift += ProgressShift;
-                        progressText.setText(String.valueOf(StartShift));
                     }
                 }
                 break;
             case R.id.FlattenButton:
-                flatten.startAnimation(animAlpha);
                 float minY = 0;
                 float maxY = 10;
                V mas_2[] = new V[mas.capacity()];
@@ -187,30 +169,25 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.CancelButton:
-                cancel.startAnimation(animAlpha);
-                final Intent callPaintIntent = new Intent(PaintActivity.this, GraphicsEditorActivity.class);
+                final Intent callPaintIntent = new Intent(PaintActivity.this,MainActivity.class);
                 startActivity(callPaintIntent);
             break;
 
         }
-        progressBar.setVisibility(ProgressBar.INVISIBLE);
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
             X = event.getX();
             Y = event.getY();
-       // Bitmap imageBitmap = ((BitmapDrawable)rezultImage.getDrawable()).getBitmap();
         switch (event.getAction()){
                 case MotionEvent.ACTION_DOWN:
-                    Text1.setText(String.valueOf((X/100)-0.25));
-                    Text2.setText(String.valueOf(((1000-Y)/100)-0.25));
 
                     V id = new V();
                     id.X = (float)((X/100)-0.25);
-                    id.Y = (float)(((1000-Y)/100)-0.25);
+                    id.Y = (float)((10-(Y/100)-0.25));
                     mas.add(id);
-                    DataPoint a = new DataPoint(((X/100)-0.25),((1000-Y)/100)-0.25);
+                    DataPoint a = new DataPoint((X/100)-0.25,(10-(Y/100)-0.25));
 
                     PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(new DataPoint[] {
                             a
@@ -221,7 +198,6 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                     series.setColor(Color.BLACK);
                     break;
             }
-        //rezultImage.setImageBitmap(imageBitmap);
         return true;
     }
 

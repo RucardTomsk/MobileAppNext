@@ -1,11 +1,9 @@
 package com.example.mobileapp;
 
-import android.animation.TypeConverter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,18 +36,14 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
 
     int Radius = 0;
     int Threshold = 0;
-   // int Amount = 0;
 
     TextView RadiusText;
     TextView ThresholdText;
-    //TextView AmountText;
 
     // Получить Uri из Bitmap
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        // Calculate inSampleSize
-        // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
                 true);
@@ -59,7 +53,6 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         out.flush();
         out.close();
-        //get absolute path
         String realPath = file.getAbsolutePath();
         File f = new File(realPath);
         uri = Uri.fromFile(f);
@@ -85,18 +78,14 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         UnsharpMaskButton = findViewById(R.id.UnsharpMaskButton);
         UnsharpMaskButton.setOnClickListener(this);
 
-        SeekBar RadiusSeekBar = (SeekBar) findViewById(R.id.RadiusSeekBar);
+        SeekBar RadiusSeekBar = findViewById(R.id.RadiusSeekBar);
         RadiusSeekBar.setOnSeekBarChangeListener(this);
 
-        SeekBar ThresholdSeekBar = (SeekBar) findViewById(R.id.ThresholdSeekBar);
+        SeekBar ThresholdSeekBar = findViewById(R.id.ThresholdSeekBar);
         ThresholdSeekBar.setOnSeekBarChangeListener(this);
-
-       // SeekBar AmountSeekBar = findViewById(R.id.AmountSeekBar);
-        //mountSeekBar.setOnSeekBarChangeListener(this);
 
         RadiusText = findViewById(R.id.RadiusText);
         ThresholdText = findViewById(R.id.ThresholdText);
-       // AmountText = findViewById(R.id.AmountText);
 
         Cancel = findViewById(R.id.CancelButton);
         Cancel.setOnClickListener(this);
@@ -115,12 +104,7 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
                 int[] mas_f = GaussianBlur(imageBitmap,Radius);
                 Bitmap newBitMap = Bitmap.createBitmap(imageBitmap.getWidth(),imageBitmap.getHeight(), imageBitmap.getConfig());
                 int counter = 0;
-                for(int i = 0; i < imageBitmap.getHeight(); i++){
-                    for(int g = 0; g < imageBitmap.getWidth(); g++){
-                       newBitMap.setPixel(g,i, mas_f[counter]);
-                        counter++;
-                    }
-                }
+                newBitMap.setPixels(mas_f,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
                  // Отобразим изменения
                 resultImage.setImageBitmap(newBitMap);
                 try {
@@ -133,7 +117,7 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
             case R.id.UnsharpMaskButton:
                  imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
                 int[] mas_o = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
-                mas_o = ReturnTheOriginalArray(mas_o,imageBitmap);
+                imageBitmap.getPixels(mas_o,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
                 int[]  mas_gause = GaussianBlur(imageBitmap,Radius);
                 mas_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
                 mas_f = mas_o;
@@ -144,14 +128,8 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
                         mas_f[i] = 2*mas_o[i] - mas_gause[i];
                 }
 
-               newBitMap = Bitmap.createBitmap(imageBitmap.getWidth(),imageBitmap.getHeight(), imageBitmap.getConfig());
-                counter = 0;
-                for(int i = 0; i < imageBitmap.getHeight(); i++){
-                    for(int g = 0; g < imageBitmap.getWidth(); g++){
-                        newBitMap.setPixel(g,i, mas_f[counter]);
-                        counter++;
-                    }
-                }
+                newBitMap = Bitmap.createBitmap(imageBitmap.getWidth(),imageBitmap.getHeight(), imageBitmap.getConfig());
+                newBitMap.setPixels(mas_f,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
                 // Отобразим изменения
                 resultImage.setImageBitmap(newBitMap);
                 try {
@@ -191,10 +169,6 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
                 Threshold = seekBar.getProgress();
                 ThresholdText.setText(String.valueOf(Threshold));
                 break;
-           // case R.id.AmountSeekBar:
-              //  Amount = seekBar.getProgress();
-               // AmountText.setText(String.valueOf(Amount));
-               // break;
         }
     }
 
@@ -216,15 +190,14 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         return tcl;
     }
 
-    public float[] boxesForGauss(float sigma,int n)  // standard deviation, number of boxes
+    public float[] boxesForGauss(float sigma,int n)
     {
-        float wIdeal = (float)Math.sqrt((12*sigma*sigma/n)+1);  // Ideal averaging filter width
+        float wIdeal = (float)Math.sqrt((12*sigma*sigma/n)+1);
         float wl = (float)Math.floor(wIdeal);  if(wl%2==0) wl--;
         float wu = wl+2;
 
         float mIdeal = (12*sigma*sigma - n*wl*wl - 4*n*wl - 3*n)/(-4*wl - 4);
         int m = Math.round(mIdeal);
-        // var sigmaActual = Math.sqrt( (m*wl*wl + (n-m)*wu*wu - n)/12 );
 
         float[] sizes = new float[n];
         for(int i=0; i<n; i++) sizes[i] = i<m?wl:wu;
@@ -246,10 +219,11 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         return tcl;
     }
 
+    //Ненужная функция , но пусть она тут будет, поскольку я над ней запарился
     private int[] ChangeContrast(Bitmap imageBitmap, int k){
        int[] mas_o = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
        int[] mas_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
-       mas_o = ReturnTheOriginalArray(mas_o,imageBitmap);
+        imageBitmap.getPixels(mas_o,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
         int RedVal, GreenVal,BlueVal;
         double Pixel;
         double Contrast = (100.0 + k)/100.0;
@@ -308,7 +282,7 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         int[] mas_green_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
         int[] mas_red_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
 
-        mas_o = ReturnTheOriginalArray(mas_o,imageBitmap);
+        imageBitmap.getPixels(mas_o,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
         for(int i = 0; i < imageBitmap.getHeight()*imageBitmap.getWidth(); i++){
             mas_blue_o[i] = mas_o[i]&0xff;
 
@@ -330,21 +304,4 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         return mas_f;
     }
 
-    private int[] ReturnTheOriginalArray(int[] mas_o, Bitmap imageBitmap){
-        int counter = 0;
-        for(int i = 0; i < imageBitmap.getHeight(); i++){
-            for(int g = 0; g < imageBitmap.getWidth(); g++){
-                mas_o[counter] = imageBitmap.getPixel(g,i);
-                counter++;
-            }
-        }
-        return mas_o;
-    }
-
-    private double ReturnBrightness(int Color){
-        int blue = Color&0xff;
-        int green = (Color&0xff00)>>8;
-        int red = (Color&0xff0000)>>16;
-        return (0.29*red + 0.58*green + 0.11*blue);
-    }
 }

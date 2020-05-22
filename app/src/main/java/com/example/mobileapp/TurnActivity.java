@@ -49,35 +49,32 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_turn);
 
-        mTextView = (TextView) findViewById(R.id.textView);
+        mTextView = findViewById(R.id.textView);
         // Получить изображение
         sourceImageURI = getIntent().getParcelableExtra("source");
         originalImageURI = getIntent().getParcelableExtra("original");
 
         resultImageURI = originalImageURI;
 
-        resultImage = (ImageView) findViewById(R.id.resultImage);
+        resultImage = findViewById(R.id.resultImage);
         resultImage.setImageURI(originalImageURI);
-       // resultImage.animate().scaleX(resultImage.getDrawable();).getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
 
-        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+        SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
 
-        mTextView = (TextView) findViewById(R.id.textView);
+        mTextView = findViewById(R.id.textView);
         mTextView.setText("0");
 
-        cancel = (Button)findViewById(R.id.cancelButton);
+        cancel = findViewById(R.id.cancelButton);
         cancel.setOnClickListener(this);
 
-        apply = (Button)findViewById(R.id.applyButton);
+        apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
       }
 
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
             final BitmapFactory.Options options = new BitmapFactory.Options();
-            // Calculate inSampleSize
-            // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
             Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
         true);
@@ -87,7 +84,6 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
             newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
-            //get absolute path
             String realPath = file.getAbsolutePath();
             File f = new File(realPath);
             uri = Uri.fromFile(f);
@@ -102,7 +98,8 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         int newWidth = bitmap.getWidth();
         int newHeight = bitmap.getHeight();
-
+        int[] mas_o = new int[newHeight*newWidth];
+        bitmap.getPixels(mas_o,0,newWidth,0,0,newWidth,newHeight);
         int x1 = (int)(-newHeight*sinf);
         int y1 = (int)(newHeight*cosf);
         int x2 = (int)(newWidth*cosf - newHeight*sinf);
@@ -117,19 +114,22 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         int Width = maxX - minX;
         int Height = maxY - minY;
-
+        int[] mas_f = new int[Width*Height];
         Bitmap newBitMap = Bitmap.createBitmap(Width,Height,bitmap.getConfig());
+
+        int color = 0xff000000 | (0 << 16) |  (64 << 8) | (138);
 
         for(int y = 0; y < Height; y++){
             for(int x = 0; x < Width; x++){
                 int sourceX = (int)((x + minX)*cosf + (y+minY)*sinf);
                 int sourceY = (int)((y+minY)*cosf - (x+minX)*sinf);
                 if(sourceX >= 0 && sourceX < newWidth && sourceY >= 0 && sourceY < newHeight)
-                    newBitMap.setPixel(x,y,bitmap.getPixel(sourceX,sourceY));
+                    mas_f[x+Width*y] = mas_o[sourceX+newWidth*sourceY];
                 else
-                    newBitMap.setPixel(x,y, Color.WHITE);
+                    mas_f[x+Width*y] = color;
             }
         }
+        newBitMap.setPixels(mas_f,0,Width,0,0,Width,Height);
         return newBitMap;
     }
     @Override
@@ -176,7 +176,6 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                         e.printStackTrace();
                     }
                 }
-                //  resultImageURI = getImageUri(getApplicationContext(), resultBitmap);
 
                 callEditorIntent.putExtra("result", resultImageURI);
                 startActivity(callEditorIntent);

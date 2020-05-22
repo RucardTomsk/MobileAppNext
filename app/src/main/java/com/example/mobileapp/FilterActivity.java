@@ -43,16 +43,10 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
     // Изображение
     ImageView resultImage;
 
-    TextView progressText;
-
-    ProgressBar progressBar;
-
     // Получить Uri из Bitmap
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        // Calculate inSampleSize
-        // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
                 true);
@@ -62,7 +56,6 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         out.flush();
         out.close();
-        //get absolute path
         String realPath = file.getAbsolutePath();
         File f = new File(realPath);
         uri = Uri.fromFile(f);
@@ -103,15 +96,10 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
         apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
-
-        progressBar = findViewById(R.id.progressBar);
-        progressText = findViewById(R.id.textView4);
-
        }
 
     // Наложить фильтр на изображение
     private void applyFilter(String color) {
-        progressBar.setVisibility(ProgressBar.VISIBLE);
         Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
         Bitmap resultBitmap = Bitmap.createBitmap(imageBitmap.getWidth(),
                 imageBitmap.getHeight(), imageBitmap.getConfig());
@@ -167,8 +155,6 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
                         pixelGreen, pixelBlue);
                 pixelArray[y * width + x] = newPixel;
             }
-            progressBar.incrementProgressBy(1);
-            progressText.setText(String.valueOf(progressBar.getProgress() + ProgressShift) + "%");
         }
         resultBitmap.setPixels(pixelArray, 0, width, 0, 0, width, height);
         // Отобразим изменения
@@ -178,8 +164,6 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         } catch (IOException e) {
             e.printStackTrace();
         }
-        progressBar.setProgress(0);
-        progressText.setText(String.valueOf(0 + "%"));
     }
 
     @Override
