@@ -37,8 +37,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button turn; // Поворот изображения
     Button scaling; // Маштабирование
     Button paint;
-    Button retouch;
-    Button segment;
+    Button unsharpmask;
     ImageButton gallery; // выбор фотографии из приложения
     ImageButton camera; // открыть камеру
     Bitmap bitmap;
@@ -55,11 +54,8 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         scaling = (Button)findViewById(R.id.ScalingButton);
         scaling.setOnClickListener(this);
 
-        retouch = findViewById(R.id.RetouchButton);
-        retouch.setOnClickListener(this);
-
-        segment = findViewById(R.id.segmentButton);
-        segment.setOnClickListener(this);
+        unsharpmask = findViewById(R.id.UnsharpMaskButton);
+        unsharpmask.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
@@ -140,18 +136,11 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 startActivity(callPaintIntent);
                 break;
 
-            case R.id.RetouchButton:
-                final Intent callRetouchIntent = new Intent(GraphicsEditorActivity.this, RetouchActivity.class);
-                callRetouchIntent.putExtra("original",resultImageURI);
-                startActivity(callRetouchIntent);
+            case R.id.UnsharpMaskButton:
+                final Intent callUnsharpIntent = new Intent(GraphicsEditorActivity.this, UnsharpMaskActivity.class);
+                callUnsharpIntent.putExtra("original", resultImageURI);
+                startActivity(callUnsharpIntent);
                 break;
-
-            case R.id.segmentButton:
-                final Intent callSegmentationIntent = new Intent(GraphicsEditorActivity.this, SegmentationActivity.class);
-                callSegmentationIntent.putExtra("original",resultImageURI);
-                startActivity(callSegmentationIntent);
-                break;
-
             default:
                 break;
         }

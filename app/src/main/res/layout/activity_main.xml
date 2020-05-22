@@ -9,13 +9,12 @@
 
     <ImageButton
         android:id="@+id/editorButton"
-        android:layout_width="373dp"
-        android:layout_height="100dp"
-        android:src="@drawable/menu_main_button_xml"
+        android:layout_width="395dp"
+        android:layout_height="124dp"
+        android:src="@drawable/menu_main_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.421"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.283" />
+        app:layout_constraintVertical_bias="0.362" />
 </androidx.constraintlayout.widget.ConstraintLayout>

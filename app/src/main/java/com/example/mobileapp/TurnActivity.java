@@ -60,7 +60,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
         resultImage.setImageURI(originalImageURI);
        // resultImage.animate().scaleX(resultImage.getDrawable();).getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
 
-        final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
 
         mTextView = (TextView) findViewById(R.id.textView);

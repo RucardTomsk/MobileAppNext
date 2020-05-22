@@ -19,12 +19,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SegmentationActivity"></activity>
-        <activity android:name=".RetouchActivity" />
-        <activity android:name=".FilterActivity" />
-        <activity android:name=".TurnActivity" />
-        <activity android:name=".ScalingActivity" />
-        <activity android:name=".PaintActivity" />
+        <activity android:name=".FilterActivity"></activity>
+        <activity android:name=".TurnActivity"></activity>
+        <activity android:name=".ScalingActivity"></activity>
+        <activity android:name=".UnsharpMaskActivity"></activity>
+        <activity android:name=".PaintActivity"></activity>
+
         <activity android:name=".GraphicsEditorActivity">
             <intent-filter>
                 <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -47,7 +47,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/file_paths"></meta-data>
         </provider>
     </application>
 

@@ -3,34 +3,46 @@ package com.example.mobileapp;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.MotionEvent;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.jjoe64.graphview.*;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.PointsGraphSeries;
 
+import java.io.IOException;
 import java.util.Vector;
 
+import static java.lang.StrictMath.abs;
 
 public class PaintActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
-    ImageView resultImage;
+    ImageView rezultImage;
     TextView Text1, Text2;
     Bitmap newBitMap;
-    Button build;
-    Button flatten;
-    Button cancel;
+    ImageButton build;
+    ImageButton flatten;
+    ImageButton cancel;
     GraphView graphView;
     ProgressBar progressBar;
     TextView progressText;
+
+    Animation animAlpha;
 
 
     public static class V{
@@ -46,16 +58,18 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paint);
 
+        animAlpha = AnimationUtils.loadAnimation(this, R.anim.alpha);
+
         Text1 = (TextView)findViewById(R.id.textView2);
         Text2 = (TextView)findViewById(R.id.textView3);
 
-        build = (Button)findViewById(R.id.BuildButton);
+        build = findViewById(R.id.BuildButton);
         build.setOnClickListener(this);
 
-        flatten = (Button)findViewById(R.id.FlattenButton);
+        flatten = findViewById(R.id.FlattenButton);
         flatten.setOnClickListener(this);
 
-        cancel = (Button)findViewById(R.id.CancelButton);
+        cancel = findViewById(R.id.CancelButton);
         cancel.setOnClickListener(this);
 
         graphView = (GraphView) findViewById(R.id.graph);
@@ -70,6 +84,7 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
         graphView.getViewport().setYAxisBoundsManual(true);
         graphView.getViewport().setMinY(0);
         graphView.getViewport().setMaxY(10);
+        graphView.setBackgroundColor(Color.WHITE);
 
         progressBar = findViewById(R.id.progressBar);
         progressText = findViewById(R.id.textView5);
@@ -82,12 +97,13 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        progressText.setText(String.valueOf("0%"));
         switch (view.getId()) {
             case R.id.BuildButton:
+                build.startAnimation(animAlpha);
                 float ProgressShift = 100/mas.capacity();
                 float StartShift = 0;
-                progressBar.setVisibility(ProgressBar.VISIBLE);
-                progressText.setText(String.valueOf("0%"));
                 V mas_3[] = new V[mas.capacity()];
 
 
@@ -124,10 +140,10 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                         StartShift += ProgressShift;
                         progressText.setText(String.valueOf(StartShift));
                     }
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
                 }
                 break;
             case R.id.FlattenButton:
+                flatten.startAnimation(animAlpha);
                 float minY = 0;
                 float maxY = 10;
                V mas_2[] = new V[mas.capacity()];
@@ -171,11 +187,13 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.CancelButton:
+                cancel.startAnimation(animAlpha);
                 final Intent callPaintIntent = new Intent(PaintActivity.this, GraphicsEditorActivity.class);
                 startActivity(callPaintIntent);
             break;
 
         }
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
     }
 
     @Override
