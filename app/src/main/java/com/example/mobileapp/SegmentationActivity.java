@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -112,5 +113,9 @@ public class SegmentationActivity extends AppCompatActivity implements View.OnCl
         uri = Uri.fromFile(f);
 
         return uri;
+    }
+
+    private void detectFace() {
+
     }
 }
