@@ -91,7 +91,7 @@ public class SegmentationActivity extends AppCompatActivity implements View.OnCl
                 break;
 
             case R.id.segmentButton:
-                Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+                Bitmap imageBitmap = ((BitmapDrawable) resultImage.getDrawable()).getBitmap();
                 Bitmap resultBitmap = detectFace(imageBitmap, this);
                 resultImage.setImageBitmap(resultBitmap);
                 try {
@@ -153,7 +153,7 @@ public class SegmentationActivity extends AppCompatActivity implements View.OnCl
 
     // Распознавание лиц
     private Bitmap detectFace(Bitmap imageBitmap, Context context) {
-        CascadeClassifier faceDetector  = initOpenCV(context);
+        CascadeClassifier faceDetector = initOpenCV(context);
         Mat image = new Mat();
         Utils.bitmapToMat(imageBitmap, image);
 

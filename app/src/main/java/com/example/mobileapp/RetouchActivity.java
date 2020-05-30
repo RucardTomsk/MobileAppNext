@@ -102,7 +102,7 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
         LButton = findViewById((R.id.LButton));
         LButton.setOnClickListener(this);
 
-        imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+        imageBitmap = ((BitmapDrawable) resultImage.getDrawable()).getBitmap();
     }
 
     @Override
@@ -177,9 +177,9 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
         // координаты текущего положения пальца на изображении
         float x = event.getX();
         float y = event.getY();
-        x *= (float)imageBitmap.getWidth() / (float)resultImage.getWidth();
-        y *= (float)imageBitmap.getHeight() / (float)resultImage.getHeight();
-        addArea((int)x, (int)y);
+        x *= (float) imageBitmap.getWidth() / (float) resultImage.getWidth();
+        y *= (float) imageBitmap.getHeight() / (float) resultImage.getHeight();
+        addArea((int) x, (int) y);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:

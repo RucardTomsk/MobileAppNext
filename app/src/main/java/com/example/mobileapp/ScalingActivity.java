@@ -24,7 +24,7 @@ import java.util.Random;
 
 import static java.lang.Math.floor;
 
-public class ScalingActivity extends AppCompatActivity implements View.OnClickListener{
+public class ScalingActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Первоначальное изображений, без изменений
     private Uri sourceImageURI;
@@ -92,10 +92,10 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ScalingButton:
-                Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
-                int newW = (int)(imageBitmap.getWidth()*Cord);
-                int newH = (int)(imageBitmap.getHeight()*Cord);
-                Bitmap resultBitMap = resample(imageBitmap.getWidth(),imageBitmap.getHeight(),newW,newH,imageBitmap);
+                Bitmap imageBitmap = ((BitmapDrawable) resultImage.getDrawable()).getBitmap();
+                int newW = (int) (imageBitmap.getWidth() * Cord);
+                int newH = (int) (imageBitmap.getHeight() * Cord);
+                Bitmap resultBitMap = resample(imageBitmap.getWidth(), imageBitmap.getHeight(), newW, newH, imageBitmap);
                 resultImage.setImageBitmap(resultBitMap);
                 try {
                     resultImageURI = bitmapToUriConverter(resultBitMap);
@@ -114,7 +114,7 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.applyButton:
-                 callEditorIntent = new Intent(ScalingActivity.this,
+                callEditorIntent = new Intent(ScalingActivity.this,
                         GraphicsEditorActivity.class);
 
                 callEditorIntent.putExtra("result", resultImageURI);
@@ -122,20 +122,20 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.button3:
-                Cord =(float) 0.5;
+                Cord = (float) 0.5;
                 mTextView.setText("X" + Cord);
                 break;
 
             case R.id.button4:
-                Cord =(float) 0.8;
+                Cord = (float) 0.8;
                 mTextView.setText("X" + Cord);
                 break;
             case R.id.button5:
-                Cord =(float) 1.5;
+                Cord = (float) 1.5;
                 mTextView.setText("X" + Cord);
                 break;
             case R.id.button6:
-                Cord =(float) 2;
+                Cord = (float) 2;
                 mTextView.setText("X" + Cord);
                 break;
         }
@@ -160,10 +160,9 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         return uri;
     }
 
-   public Bitmap resample(int oldw, int oldh, int neww, int newh, Bitmap a_Bit)
-    {
-        int[] a = new int[oldh*oldw];
-        a_Bit.getPixels(a,0,oldw,0,0,oldw,oldh);
+    public Bitmap resample(int oldw, int oldh, int neww, int newh, Bitmap a_Bit) {
+        int[] a = new int[oldh * oldw];
+        a_Bit.getPixels(a, 0, oldw, 0, 0, oldw, oldh);
         int i, j;
         int h, w;
         float t;
@@ -173,7 +172,7 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
         int p1, p2, p3, p4;
 
         int red, green, blue;
-        int[] b = new int[newh*neww];
+        int[] b = new int[newh * neww];
         for (j = 0; j < newh; j++) {
             tmp = (float) (j) / (float) (newh - 1) * (oldh - 1);
             h = (int) floor(tmp);
@@ -204,21 +203,21 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
                 d3 = t * u;
                 d4 = (1 - t) * u;
 
-                p1 = a[w + oldw*h];
-                p2 = a[w +1 + oldw*h];
-                p3 = a[w+1 + oldw*(h+1)];
-                p4 = a[w + oldw*(h+1)];
+                p1 = a[w + oldw * h];
+                p2 = a[w + 1 + oldw * h];
+                p3 = a[w + 1 + oldw * (h + 1)];
+                p4 = a[w + oldw * (h + 1)];
 
-                blue = (int)(((p1 & 0xff)) * d1 + ((p2 & 0xff)) * d2 + (char) ((p3 & 0xff)) * d3 + ((p4 & 0xff)) * d4);
-                green = (int)(((p1 & 0xff00) >> 8) * d1 + ((p2 & 0xff00) >> 8) * d2 + (char) ((p3 & 0xff00) >> 8) * d3 + ((p4 & 0xff00)>> 8) * d4);
-                red = (int)(((p1 & 0xff0000) >> 16) * d1 + ((p2 & 0xff0000) >> 16) * d2 + (char) ((p3 & 0xff0000) >> 16) * d3 + ((p4 & 0xff0000)>> 16) * d4);
+                blue = (int) (((p1 & 0xff)) * d1 + ((p2 & 0xff)) * d2 + (char) ((p3 & 0xff)) * d3 + ((p4 & 0xff)) * d4);
+                green = (int) (((p1 & 0xff00) >> 8) * d1 + ((p2 & 0xff00) >> 8) * d2 + (char) ((p3 & 0xff00) >> 8) * d3 + ((p4 & 0xff00) >> 8) * d4);
+                red = (int) (((p1 & 0xff0000) >> 16) * d1 + ((p2 & 0xff0000) >> 16) * d2 + (char) ((p3 & 0xff0000) >> 16) * d3 + ((p4 & 0xff0000) >> 16) * d4);
 
-               b[i+neww*j] = 0xff000000 | (red << 16) |  (green << 8) | (blue);
+                b[i + neww * j] = 0xff000000 | (red << 16) | (green << 8) | (blue);
             }
         }
-        Bitmap newBitMap = Bitmap.createBitmap(neww,newh, Bitmap.Config.ARGB_8888);
+        Bitmap newBitMap = Bitmap.createBitmap(neww, newh, Bitmap.Config.ARGB_8888);
 
-        newBitMap.setPixels(b,0,neww,0,0,neww,newh);
+        newBitMap.setPixels(b, 0, neww, 0, 0, neww, newh);
         return newBitMap;
     }
 }
