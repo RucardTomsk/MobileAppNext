@@ -2,9 +2,9 @@ package com.example.mobileapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,7 +47,10 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_turn);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout.activity_turn);
+        else
+            setContentView(R.layout.activity_turn_n);
 
         mTextView = findViewById(R.id.textView);
         // Получить изображение
@@ -58,6 +61,17 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         resultImage = findViewById(R.id.resultImage);
         resultImage.setImageURI(originalImageURI);
+
+        if (savedInstanceState != null) {
+            Bitmap newBitMap = Bitmap.createBitmap(savedInstanceState.getInt("W"),savedInstanceState.getInt("H"), Bitmap.Config.ARGB_8888);
+            newBitMap.setPixels(savedInstanceState.getIntArray("resultImage"),0,newBitMap.getWidth(),0,0,newBitMap.getWidth(),newBitMap.getHeight());
+            resultImage.setImageBitmap(newBitMap);
+            try {
+                resultImageURI = bitmapToUriConverter(newBitMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
@@ -199,7 +213,8 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        resultImage.animate().scaleX(resultImage.getWidth()*1.0f/resultImage.getHeight()).scaleY(resultImage.getWidth()*1.0f/resultImage.getHeight()).start();
     }
 
     @Override
@@ -210,6 +225,17 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
     public void rotate(int angle) {
         resultImage.animate().rotation(angle).start();
         StartingDegree = angle;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+        int[] mas = new int[imageBitmap.getHeight()*imageBitmap.getWidth()];
+        imageBitmap.getPixels(mas,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+        outState.putIntArray("resultImage", mas);
+        outState.putInt("W", imageBitmap.getWidth());
+        outState.putInt("H", imageBitmap.getHeight());
     }
 }
 

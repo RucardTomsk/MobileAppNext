@@ -2,7 +2,6 @@ package com.example.mobileapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -77,6 +76,16 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
         resultImage = findViewById(R.id.image);
         resultImage.setImageURI(resultImageURI);
         resultImage.setOnTouchListener(this);
+        if (savedInstanceState != null) {
+            Bitmap newBitMap = Bitmap.createBitmap(savedInstanceState.getInt("W"),savedInstanceState.getInt("H"), Bitmap.Config.ARGB_8888);
+            newBitMap.setPixels(savedInstanceState.getIntArray("resultImage"),0,newBitMap.getWidth(),0,0,newBitMap.getWidth(),newBitMap.getHeight());
+            resultImage.setImageBitmap(newBitMap);
+            try {
+                resultImageURI = bitmapToUriConverter(newBitMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         cancel = findViewById(R.id.cancelButton);
         cancel.setOnClickListener(this);
@@ -94,6 +103,17 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
         LButton.setOnClickListener(this);
 
         imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+        int[] mas = new int[imageBitmap.getHeight()*imageBitmap.getWidth()];
+        imageBitmap.getPixels(mas,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+        outState.putIntArray("resultImage", mas);
+        outState.putInt("W", imageBitmap.getWidth());
+        outState.putInt("H", imageBitmap.getHeight());
     }
 
     @Override

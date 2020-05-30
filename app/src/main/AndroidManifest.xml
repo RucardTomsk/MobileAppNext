@@ -13,6 +13,7 @@
         android:required="false" />
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,6 +28,7 @@
         <activity android:name=".RetouchActivity"></activity>
         <activity android:name=".SegmentationActivity"></activity>
 
+
         <activity android:name=".GraphicsEditorActivity">
             <intent-filter>
                 <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -34,6 +36,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

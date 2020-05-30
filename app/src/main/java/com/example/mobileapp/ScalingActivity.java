@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -49,7 +50,10 @@ public class ScalingActivity extends AppCompatActivity implements View.OnClickLi
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scaling);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout.activity_scaling);
+        else
+            setContentView(R.layout.activity_scaling_n);
 
         mTextView = findViewById(R.id.textView);
         // Получить изображение

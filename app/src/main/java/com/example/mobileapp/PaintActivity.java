@@ -3,43 +3,26 @@ package com.example.mobileapp;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.view.MotionEvent;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.jjoe64.graphview.*;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.PointsGraphSeries;
 
-import java.io.IOException;
 import java.util.Vector;
-
-import static java.lang.StrictMath.abs;
 
 public class PaintActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
-    ImageView rezultImage;
-    Bitmap newBitMap;
     Button build;
     Button flatten;
     Button cancel;
+    Button clear;
     GraphView graphView;
 
 
@@ -65,15 +48,16 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
         cancel = findViewById(R.id.CancelButton);
         cancel.setOnClickListener(this);
 
-        graphView = (GraphView) findViewById(R.id.graph);
+        clear = findViewById(R.id.ClearButton);
+        clear.setOnClickListener(this);
+
+        graphView = findViewById(R.id.graph);
         graphView.setOnTouchListener(this);
 
-        // set manual X bounds
         graphView.getViewport().setXAxisBoundsManual(true);
         graphView.getViewport().setMinX(0);
         graphView.getViewport().setMaxX(10);
 
-        // set manual Y bounds
         graphView.getViewport().setYAxisBoundsManual(true);
         graphView.getViewport().setMinY(0);
         graphView.getViewport().setMaxY(10);
@@ -165,7 +149,6 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                }
                 graphView.getViewport().setMinY(minY);
                 graphView.getViewport().setMaxY(maxY);
-
                 break;
 
             case R.id.CancelButton:
@@ -173,33 +156,41 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(callPaintIntent);
             break;
 
+            case R.id.ClearButton:
+                graphView.removeAllSeries();
+                mas = new Vector<V>(0,1);
+                graphView.getViewport().setMinX(0);
+                graphView.getViewport().setMaxX(10);
+                graphView.getViewport().setMinY(0);
+                graphView.getViewport().setMaxY(10);
+                break;
         }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-            X = event.getX();
-            Y = event.getY();
+        X = event.getX();
+        Y = event.getY();
         switch (event.getAction()){
-                case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN:
 
-                    V id = new V();
-                    id.X = (float)((X/100)-0.25);
-                    id.Y = (float)((10-(Y/100)-0.25));
-                    mas.add(id);
-                    DataPoint a = new DataPoint((X/100)-0.25,(10-(Y/100)-0.25));
+                V id = new V();
+                id.X = (float)((X/100)-0.25);
+                id.Y = (float)((10-(Y/100)-0.25));
+                mas.add(id);
+                DataPoint a = new DataPoint((X/100)-0.25,(10-(Y/100)-0.25));
 
-                    PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(new DataPoint[] {
-                            a
-                    });
+                PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(new DataPoint[] {
+                        a
+                });
 
-                    graphView.addSeries(series);
-                    series.setShape(PointsGraphSeries.Shape.POINT);
-                    series.setColor(Color.BLACK);
-                    break;
-            }
+                graphView.addSeries(series);
+                series.setShape(PointsGraphSeries.Shape.POINT);
+                series.setColor(Color.BLACK);
+                break;
+        }
         return true;
-    }
+    };
 
     public float lagrange(V mas[], int n, double _x){
 

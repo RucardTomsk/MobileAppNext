@@ -1,9 +1,12 @@
 package com.example.mobileapp;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -14,11 +17,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -37,6 +42,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     Button filter; // наложение цветового фильтра
     Button turn; // Поворот изображения
     Button scaling; // Маштабирование
+    Button save;
     Button unsharpmask;
     Button retouch;
 
@@ -64,10 +70,12 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
         segment = findViewById(R.id.segmentButton);
         segment.setOnClickListener(this);
+
+        save = findViewById(R.id.saveButton);
+        save.setOnClickListener(this);
     }
 
     private Bitmap SET(Bitmap bitmap){
-       // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
         float aspectRetio = (float)bitmap.getHeight()/(float)bitmap.getWidth();
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int MImageWidth = displayMetrics.widthPixels;
@@ -78,7 +86,10 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_graphics_editor);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout.activity_graphics_editor);
+        else
+            setContentView(R.layout.activity_graphics_editor_n);
 
         if (getIntent().getParcelableExtra("result") != null) {
             resultImageURI = getIntent().getParcelableExtra("result");
@@ -98,6 +109,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         camera.setOnClickListener(this);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View view) {
         switch(view.getId()) {
@@ -152,6 +164,38 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 final Intent callSegmentationIntent = new Intent(GraphicsEditorActivity.this, SegmentationActivity.class);
                 callSegmentationIntent.putExtra("original", resultImageURI);
                 startActivity(callSegmentationIntent);
+                break;
+
+            case R.id.saveButton:
+                BitmapDrawable draw = (BitmapDrawable) resultImage.getDrawable();
+                Bitmap bitmap = draw.getBitmap();
+
+                FileOutputStream outStream = null;
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File(sdCard.getAbsolutePath() + "/YourFolderName");
+                dir.mkdirs();
+                String fileName = String.format("%d.jpg", System.currentTimeMillis());
+                File outFile = new File(dir, fileName);
+                try {
+                    outStream = new FileOutputStream(outFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                try {
+                    outStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                intent.setData(Uri.fromFile(outFile));
+                sendBroadcast(intent);
                 break;
 
             default:

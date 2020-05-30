@@ -2,14 +2,17 @@ package com.example.mobileapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -32,13 +35,15 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
     Button UnsharpMaskButton;
     Button Cancel;
     Button Apply;
-    Bitmap resultBitmap;
 
     int Radius = 0;
     int Threshold = 0;
 
     TextView RadiusText;
     TextView ThresholdText;
+    TextView LoadinText;
+
+    ProgressBar LoadingProgres;
 
     // Получить Uri из Bitmap
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
@@ -63,7 +68,10 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_unsharp_mask);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout.activity_unsharp_mask);
+        else
+            setContentView(R.layout.activity_unsharp_mask_n);
 
         originalImageURI = getIntent().getParcelableExtra("original");
 
@@ -71,6 +79,17 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
 
         resultImage = findViewById(R.id.resultImage);
         resultImage.setImageURI(originalImageURI);
+
+        if (savedInstanceState != null) {
+            Bitmap newBitMap = Bitmap.createBitmap(savedInstanceState.getInt("W"),savedInstanceState.getInt("H"), Bitmap.Config.ARGB_8888);
+            newBitMap.setPixels(savedInstanceState.getIntArray("resultImage"),0,newBitMap.getWidth(),0,0,newBitMap.getWidth(),newBitMap.getHeight());
+            resultImage.setImageBitmap(newBitMap);
+            try {
+                resultImageURI = bitmapToUriConverter(newBitMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         gaussianButton = findViewById(R.id.GaussianBlurButton);
         gaussianButton.setOnClickListener(this);
@@ -92,6 +111,9 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
 
         Apply = findViewById(R.id.ApplyButton);
         Apply.setOnClickListener(this);
+
+        LoadinText = findViewById(R.id.textViewLoading);
+        LoadingProgres = findViewById(R.id.progressBar);
 
     }
     @Override
@@ -115,28 +137,8 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.UnsharpMaskButton:
-                 imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
-                int[] mas_o = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
-                imageBitmap.getPixels(mas_o,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
-                int[]  mas_gause = GaussianBlur(imageBitmap,Radius);
-                mas_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
-                mas_f = mas_o;
-
-
-                for(int i = 0; i < imageBitmap.getWidth()*imageBitmap.getHeight(); i++){
-                    if(2*mas_o[i] - mas_gause[i] > Threshold)
-                        mas_f[i] = 2*mas_o[i] - mas_gause[i];
-                }
-
-                newBitMap = Bitmap.createBitmap(imageBitmap.getWidth(),imageBitmap.getHeight(), imageBitmap.getConfig());
-                newBitMap.setPixels(mas_f,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
-                // Отобразим изменения
-                resultImage.setImageBitmap(newBitMap);
-                try {
-                    resultImageURI = bitmapToUriConverter(newBitMap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                UnsharpTask UnsharpTask = new UnsharpTask();
+                UnsharpTask.execute();
                 break;
 
             case R.id.ApplyButton:
@@ -304,4 +306,68 @@ public class UnsharpMaskActivity extends AppCompatActivity implements View.OnCli
         return mas_f;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+        int[] mas = new int[imageBitmap.getHeight()*imageBitmap.getWidth()];
+        imageBitmap.getPixels(mas,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+        outState.putIntArray("resultImage", mas);
+        outState.putInt("W", imageBitmap.getWidth());
+        outState.putInt("H", imageBitmap.getHeight());
+    }
+
+    class UnsharpTask extends AsyncTask<Void, Void, Bitmap> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+           LoadinText.setText("Loading...");
+           LoadingProgres.setVisibility(ProgressBar.VISIBLE);
+           Cancel.setVisibility(View.INVISIBLE);
+           Apply.setVisibility(View.INVISIBLE);
+           UnsharpMaskButton.setVisibility(View.INVISIBLE);
+           gaussianButton.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... voids) {
+            Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+
+            int[] mas_o = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
+            imageBitmap.getPixels(mas_o,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+            int[]  mas_gause = GaussianBlur(imageBitmap,Radius);
+            int[] mas_f = new int[imageBitmap.getWidth()*imageBitmap.getHeight()];
+            mas_f = mas_o;
+
+
+            for(int i = 0; i < imageBitmap.getWidth()*imageBitmap.getHeight(); i++){
+                if(mas_o[i] - mas_gause[i] > Threshold)
+                    mas_f[i] = mas_f[i] + (mas_o[i] - mas_gause[i]);
+            }
+
+            Bitmap newBitMap = Bitmap.createBitmap(imageBitmap.getWidth(),imageBitmap.getHeight(), imageBitmap.getConfig());
+            newBitMap.setPixels(mas_f,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+            // Отобразим изменения
+
+            return newBitMap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap newBitmap) {
+            super.onPostExecute(newBitmap);
+            LoadinText.setText("");
+            LoadingProgres.setVisibility(ProgressBar.INVISIBLE);
+            Cancel.setVisibility(View.VISIBLE);
+            Apply.setVisibility(View.VISIBLE);
+            UnsharpMaskButton.setVisibility(View.VISIBLE);
+            gaussianButton.setVisibility(View.VISIBLE);
+            resultImage.setImageBitmap(newBitmap);
+            try {
+                    resultImageURI = bitmapToUriConverter(newBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

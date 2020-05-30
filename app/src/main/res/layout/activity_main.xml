@@ -51,17 +51,6 @@
             android:textColor="#F3ECEC"
             android:textSize="30sp" />
 
-        <Button
-            android:id="@+id/cubeButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:background="@drawable/main_button"
-            android:padding="20dp"
-            android:text="Cube"
-            android:textColor="#F3ECEC"
-            android:textSize="30sp" />
     </LinearLayout>
 
      <ImageView

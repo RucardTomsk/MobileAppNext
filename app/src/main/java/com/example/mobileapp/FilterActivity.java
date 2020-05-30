@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,8 +13,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,6 +41,7 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
     // Изображение
     ImageView resultImage;
+    ImageView ImageBlue,ImageRed,ImageNegetive,ImageGrey,ImageGreen ;
 
     // Получить Uri из Bitmap
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
@@ -66,7 +66,10 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_filter);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout.activity_filter);
+        else
+            setContentView(R.layout.activity_filter_n);
 
         // Получить изображение
         originalImageURI = getIntent().getParcelableExtra("original");
@@ -74,6 +77,18 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
         resultImage = findViewById(R.id.resultImage);
         resultImage.setImageURI(resultImageURI);
+
+        if (savedInstanceState != null) {
+            Bitmap newBitMap = Bitmap.createBitmap(savedInstanceState.getInt("W"),savedInstanceState.getInt("H"), Bitmap.Config.ARGB_8888);
+            newBitMap.setPixels(savedInstanceState.getIntArray("resultImage"),0,newBitMap.getWidth(),0,0,newBitMap.getWidth(),newBitMap.getHeight());
+            resultImage.setImageBitmap(newBitMap);
+            try {
+                resultImageURI = bitmapToUriConverter(newBitMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         // Инициализировать кнопки
         redColor = findViewById(R.id.redButton);
@@ -96,10 +111,21 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
         apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
+
+        ImageBlue = findViewById(R.id.imageViewBlue);
+        applyFilter("blue",ImageBlue,false);
+        ImageRed = findViewById(R.id.imageViewRed);
+        applyFilter("red",ImageRed,false);
+        ImageGreen = findViewById(R.id.imageViewGreen);
+        applyFilter("green",ImageGreen,false);
+        ImageGrey = findViewById(R.id.imageViewGrey);
+        applyFilter("grey",ImageGrey,false);
+        ImageNegetive = findViewById(R.id.imageViewNegative);
+        applyFilter("negative",ImageNegetive,false);
        }
 
     // Наложить фильтр на изображение
-    private void applyFilter(String color) {
+    private void applyFilter(String color, ImageView image, boolean BOL) {
         Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
         Bitmap resultBitmap = Bitmap.createBitmap(imageBitmap.getWidth(),
                 imageBitmap.getHeight(), imageBitmap.getConfig());
@@ -158,8 +184,9 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
         }
         resultBitmap.setPixels(pixelArray, 0, width, 0, 0, width, height);
         // Отобразим изменения
-        resultImage.setImageBitmap(resultBitmap);
+        image.setImageBitmap(resultBitmap);
         try {
+            if(BOL)
             resultImageURI = bitmapToUriConverter(resultBitmap);
         } catch (IOException e) {
             e.printStackTrace();
@@ -190,30 +217,42 @@ public class FilterActivity extends AppCompatActivity implements OnClickListener
 
             // Применить синий фильтр
             case R.id.blueButton:
-                applyFilter("blue");
+                applyFilter("blue",resultImage,true);
                 break;
 
             // Применить зелёный фильтр
             case R.id.greenButton:
-                applyFilter("green");
+                applyFilter("green",resultImage,true);
                 break;
 
             // Применить красный фильтр
             case R.id.redButton:
-                applyFilter("red");
+                applyFilter("red",resultImage,true);
                 break;
 
             // Применить негатив
             case R.id.negativeButton:
-                applyFilter("negative");
+                applyFilter("negative",resultImage,true);
                 break;
             // Применить серые тона
             case R.id.greyButton:
-                applyFilter("grey");
+                applyFilter("grey",resultImage,true);
                 break;
 
             default:
                 break;
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
+        int[] mas = new int[imageBitmap.getHeight()*imageBitmap.getWidth()];
+        imageBitmap.getPixels(mas,0,imageBitmap.getWidth(),0,0,imageBitmap.getWidth(),imageBitmap.getHeight());
+        outState.putIntArray("resultImage", mas);
+        outState.putInt("W", imageBitmap.getWidth());
+        outState.putInt("H", imageBitmap.getHeight());
+    }
+
 }
