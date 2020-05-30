@@ -25,6 +25,7 @@
         <activity android:name=".UnsharpMaskActivity"></activity>
         <activity android:name=".PaintActivity"></activity>
         <activity android:name=".RetouchActivity"></activity>
+        <activity android:name=".SegmentationActivity"></activity>
 
         <activity android:name=".GraphicsEditorActivity">
             <intent-filter>
