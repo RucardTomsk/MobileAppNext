@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -49,6 +50,10 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
     // Кнопки для отмены или принятия изменений
     Button cancel;
     Button apply;
+    // Кнопки выбора размера кисточки
+    Button SButton;
+    Button MButton;
+    Button LButton;
 
     // Изображение
     ImageView resultImage;
@@ -57,6 +62,8 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
 
     // координаты области касания
     HashSet<Pixel> pixels = new HashSet<>();
+
+    int brush = 21; // размер кисточки
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +83,15 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
 
         apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
+
+        SButton = findViewById((R.id.SButton));
+        SButton.setOnClickListener(this);
+
+        MButton = findViewById((R.id.MButton));
+        MButton.setOnClickListener(this);
+
+        LButton = findViewById((R.id.LButton));
+        LButton.setOnClickListener(this);
 
         imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
     }
@@ -101,6 +117,18 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(callEditorIntent);
                 break;
 
+            case R.id.SButton:
+                brush = 21;
+                break;
+
+            case R.id.MButton:
+                brush = 31;
+                break;
+
+            case R.id.LButton:
+                brush = 41;
+                break;
+
             default:
                 break;
         }
@@ -117,9 +145,9 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void addArea(int x, int y) {
-        for (int i = 0; i < 21; i++) {
-            for (int j = 0; j < 21; j++) {
-                addPixel(x - 10 + i, y - 10 + j);
+        for (int i = 0; i < brush; i++) {
+            for (int j = 0; j < brush; j++) {
+                addPixel(x - brush / 2 + i, y - brush / 2 + j);
             }
         }
     }
@@ -217,5 +245,4 @@ public class RetouchActivity extends AppCompatActivity implements View.OnClickLi
 
         return uri;
     }
-
 }
