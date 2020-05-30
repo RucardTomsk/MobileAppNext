@@ -50,10 +50,10 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         filter = findViewById(R.id.filterButton);
         filter.setOnClickListener(this);
 
-        turn = (Button)findViewById(R.id.TurnButton);
+        turn = (Button) findViewById(R.id.TurnButton);
         turn.setOnClickListener(this);
 
-        scaling = (Button)findViewById(R.id.ScalingButton);
+        scaling = (Button) findViewById(R.id.ScalingButton);
         scaling.setOnClickListener(this);
 
         unsharpmask = findViewById(R.id.UnsharpMaskButton);
@@ -66,15 +66,16 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
         segment.setOnClickListener(this);
     }
 
-    private Bitmap SET(Bitmap bitmap){
-       // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
-        float aspectRetio = (float)bitmap.getHeight()/(float)bitmap.getWidth();
+    private Bitmap SET(Bitmap bitmap) {
+        // resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
+        float aspectRetio = (float) bitmap.getHeight() / (float) bitmap.getWidth();
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int MImageWidth = displayMetrics.widthPixels;
-        int MImageHeight = (int)(MImageWidth*aspectRetio);
-        Bitmap MBitMap = Bitmap.createScaledBitmap(bitmap,MImageWidth,MImageHeight,false);
+        int MImageHeight = (int) (MImageWidth * aspectRetio);
+        Bitmap MBitMap = Bitmap.createScaledBitmap(bitmap, MImageWidth, MImageHeight, false);
         return MBitMap;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +101,7 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.menuButton:
                 final Intent callEditorIntent = new Intent(GraphicsEditorActivity.this, MainActivity.class);
                 startActivity(callEditorIntent);
@@ -126,13 +127,13 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
 
             case R.id.TurnButton:
                 final Intent callTurnIntent = new Intent(GraphicsEditorActivity.this, TurnActivity.class);
-                callTurnIntent.putExtra("original",resultImageURI);
+                callTurnIntent.putExtra("original", resultImageURI);
                 startActivity(callTurnIntent);
                 break;
 
             case R.id.ScalingButton:
                 final Intent callScalingIntent = new Intent(GraphicsEditorActivity.this, ScalingActivity.class);
-                callScalingIntent.putExtra("original",resultImageURI);
+                callScalingIntent.putExtra("original", resultImageURI);
                 startActivity(callScalingIntent);
                 break;
 
@@ -178,10 +179,10 @@ public class GraphicsEditorActivity extends AppCompatActivity implements View.On
                 break;
 
             case CAMERA_REQUEST:
-                if (resultCode == RESULT_OK ) {
+                if (resultCode == RESULT_OK) {
                     resultImage.setImageURI(resultImageURI);
                 }
-                    break;
+                break;
 
             default:
                 break;

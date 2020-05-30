@@ -70,77 +70,77 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
         apply = findViewById(R.id.applyButton);
         apply.setOnClickListener(this);
-      }
+    }
 
     public Uri bitmapToUriConverter(Bitmap mBitmap) throws IOException {
         Uri uri = null;
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
-        true);
-            File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
-            FileOutputStream out = openFileOutput(file.getName(),
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = false;
+        Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(),
+                true);
+        File file = new File(getFilesDir(), "Image" + new Random().nextInt() + "jpeg");
+        FileOutputStream out = openFileOutput(file.getName(),
                 Context.MODE_APPEND);
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-            String realPath = file.getAbsolutePath();
-            File f = new File(realPath);
-            uri = Uri.fromFile(f);
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        out.flush();
+        out.close();
+        String realPath = file.getAbsolutePath();
+        File f = new File(realPath);
+        uri = Uri.fromFile(f);
 
         return uri;
     }
 
-    public Bitmap BitMapRotate(Bitmap bitmap, int degrees){
-        double rad = (degrees*3.14f)/180f;
+    public Bitmap BitMapRotate(Bitmap bitmap, int degrees) {
+        double rad = (degrees * 3.14f) / 180f;
         double cosf = cos(rad);
         double sinf = sin(rad);
 
         int newWidth = bitmap.getWidth();
         int newHeight = bitmap.getHeight();
-        int[] mas_o = new int[newHeight*newWidth];
-        bitmap.getPixels(mas_o,0,newWidth,0,0,newWidth,newHeight);
-        int x1 = (int)(-newHeight*sinf);
-        int y1 = (int)(newHeight*cosf);
-        int x2 = (int)(newWidth*cosf - newHeight*sinf);
-        int y2 = (int)(newHeight*cosf + newWidth*sinf);
-        int x3 = (int)(newWidth*cosf);
-        int y3 = (int)(newWidth*sinf);
+        int[] mas_o = new int[newHeight * newWidth];
+        bitmap.getPixels(mas_o, 0, newWidth, 0, 0, newWidth, newHeight);
+        int x1 = (int) (-newHeight * sinf);
+        int y1 = (int) (newHeight * cosf);
+        int x2 = (int) (newWidth * cosf - newHeight * sinf);
+        int y2 = (int) (newHeight * cosf + newWidth * sinf);
+        int x3 = (int) (newWidth * cosf);
+        int y3 = (int) (newWidth * sinf);
 
-        int minX = min(0,min(x1,min(x2,x3)));
-        int minY = min(0,min(y1,min(y2,y3)));
-        int maxX = max(0,max(x1,max(x2,x3)));
-        int maxY = max(0,max(y1,max(y2,y3)));
+        int minX = min(0, min(x1, min(x2, x3)));
+        int minY = min(0, min(y1, min(y2, y3)));
+        int maxX = max(0, max(x1, max(x2, x3)));
+        int maxY = max(0, max(y1, max(y2, y3)));
 
         int Width = maxX - minX;
         int Height = maxY - minY;
-        int[] mas_f = new int[Width*Height];
-        Bitmap newBitMap = Bitmap.createBitmap(Width,Height,bitmap.getConfig());
+        int[] mas_f = new int[Width * Height];
+        Bitmap newBitMap = Bitmap.createBitmap(Width, Height, bitmap.getConfig());
 
-        int color = 0xff000000 | (0 << 16) |  (64 << 8) | (138);
+        int color = 0xff000000 | (0 << 16) | (64 << 8) | (138);
 
-        for(int y = 0; y < Height; y++){
-            for(int x = 0; x < Width; x++){
-                int sourceX = (int)((x + minX)*cosf + (y+minY)*sinf);
-                int sourceY = (int)((y+minY)*cosf - (x+minX)*sinf);
-                if(sourceX >= 0 && sourceX < newWidth && sourceY >= 0 && sourceY < newHeight)
-                    mas_f[x+Width*y] = mas_o[sourceX+newWidth*sourceY];
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                int sourceX = (int) ((x + minX) * cosf + (y + minY) * sinf);
+                int sourceY = (int) ((y + minY) * cosf - (x + minX) * sinf);
+                if (sourceX >= 0 && sourceX < newWidth && sourceY >= 0 && sourceY < newHeight)
+                    mas_f[x + Width * y] = mas_o[sourceX + newWidth * sourceY];
                 else
-                    mas_f[x+Width*y] = color;
+                    mas_f[x + Width * y] = color;
             }
         }
-        newBitMap.setPixels(mas_f,0,Width,0,0,Width,Height);
+        newBitMap.setPixels(mas_f, 0, Width, 0, 0, Width, Height);
         return newBitMap;
     }
+
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.applyButton:
                 Intent callEditorIntent = new Intent(TurnActivity.this,
                         GraphicsEditorActivity.class);
-                Bitmap imageBitmap = ((BitmapDrawable)resultImage.getDrawable()).getBitmap();
-               if(StartingDegree >= 0 && StartingDegree < 90)
-                {
+                Bitmap imageBitmap = ((BitmapDrawable) resultImage.getDrawable()).getBitmap();
+                if (StartingDegree >= 0 && StartingDegree < 90) {
                     try {
                         resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree));
                     } catch (IOException e) {
@@ -148,24 +148,24 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
-                   if(StartingDegree >= 90 && StartingDegree <180) {
-                           imageBitmap = BitMapRotate(imageBitmap, 90);
-                           try {
-                               resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree - 90));
-                           } catch (IOException e) {
-                               e.printStackTrace();
-                           }
-                   }
+                if (StartingDegree >= 90 && StartingDegree < 180) {
+                    imageBitmap = BitMapRotate(imageBitmap, 90);
+                    try {
+                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree - 90));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-                   if (StartingDegree >= 180 && StartingDegree < 270) {
-                           imageBitmap = BitMapRotate(imageBitmap, 90);
-                           imageBitmap = BitMapRotate(imageBitmap, 90);
-                           try {
-                               resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree - 180));
-                           } catch (IOException e) {
-                               e.printStackTrace();
-                           }
-                       }
+                if (StartingDegree >= 180 && StartingDegree < 270) {
+                    imageBitmap = BitMapRotate(imageBitmap, 90);
+                    imageBitmap = BitMapRotate(imageBitmap, 90);
+                    try {
+                        resultImageURI = bitmapToUriConverter(BitMapRotate(imageBitmap, StartingDegree - 180));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (StartingDegree >= 270 && StartingDegree <= 360) {
                     imageBitmap = BitMapRotate(imageBitmap, 90);
                     imageBitmap = BitMapRotate(imageBitmap, 90);
@@ -199,7 +199,7 @@ public class TurnActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width()*1.0f/resultImage.getDrawable().getBounds().height()).start();
+        resultImage.animate().scaleX(resultImage.getDrawable().getBounds().width() * 1.0f / resultImage.getDrawable().getBounds().height()).scaleY(resultImage.getDrawable().getBounds().width() * 1.0f / resultImage.getDrawable().getBounds().height()).start();
     }
 
     @Override

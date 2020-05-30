@@ -43,13 +43,13 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
     GraphView graphView;
 
 
-    public static class V{
+    public static class V {
         float X;
         float Y;
     }
 
-    Vector mas = new Vector<V>(0,1);
-    float X,Y;
+    Vector mas = new Vector<V>(0, 1);
+    float X, Y;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +80,8 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-    public float f(float a, float b, float x){
-        return a*x+b;
+    public float f(float a, float b, float x) {
+        return a * x + b;
     }
 
     @Override
@@ -92,15 +92,15 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
                 V mas_3[] = new V[mas.capacity()];
 
 
-                for(int i = 0; i < mas.capacity(); i++)
-                    mas_3[i] = (V)mas.get(i);
+                for (int i = 0; i < mas.capacity(); i++)
+                    mas_3[i] = (V) mas.get(i);
 
-                for(int i = 0; i < mas_3.length; i++){
-                    for(int g = 0; g < mas_3.length-1; g++){
-                        if(mas_3[g].X > mas_3[g+1].X){
+                for (int i = 0; i < mas_3.length; i++) {
+                    for (int g = 0; g < mas_3.length - 1; g++) {
+                        if (mas_3[g].X > mas_3[g + 1].X) {
                             V tmp = mas_3[g];
-                            mas_3[g] = mas_3[g+1];
-                            mas_3[g+1] = tmp;
+                            mas_3[g] = mas_3[g + 1];
+                            mas_3[g + 1] = tmp;
                         }
                     }
                 }
@@ -128,90 +128,90 @@ public class PaintActivity extends AppCompatActivity implements View.OnClickList
             case R.id.FlattenButton:
                 float minY = 0;
                 float maxY = 10;
-               V mas_2[] = new V[mas.capacity()];
+                V mas_2[] = new V[mas.capacity()];
 
 
-               for(int i = 0; i < mas.capacity(); i++)
-                   mas_2[i] = (V)mas.get(i);
+                for (int i = 0; i < mas.capacity(); i++)
+                    mas_2[i] = (V) mas.get(i);
 
-               for(int i = 0; i < mas_2.length; i++){
-                   for(int g = 0; g < mas_2.length-1; g++){
-                       if(mas_2[g].X > mas_2[g+1].X){
-                           V tmp = mas_2[g];
-                           mas_2[g] = mas_2[g+1];
-                           mas_2[g+1] = tmp;
-                       }
-                   }
-               }
+                for (int i = 0; i < mas_2.length; i++) {
+                    for (int g = 0; g < mas_2.length - 1; g++) {
+                        if (mas_2[g].X > mas_2[g + 1].X) {
+                            V tmp = mas_2[g];
+                            mas_2[g] = mas_2[g + 1];
+                            mas_2[g + 1] = tmp;
+                        }
+                    }
+                }
 
-               for(float i = mas_2[0].X + 0.005f; i < mas_2[mas.capacity()-1].X - 0.005f; i = i + 0.005f){
-                   float y = lagrange(mas_2, mas.capacity(), i);
-                   DataPoint k = new DataPoint(i, y);
-                    if(y > maxY){
+                for (float i = mas_2[0].X + 0.005f; i < mas_2[mas.capacity() - 1].X - 0.005f; i = i + 0.005f) {
+                    float y = lagrange(mas_2, mas.capacity(), i);
+                    DataPoint k = new DataPoint(i, y);
+                    if (y > maxY) {
                         maxY = y;
                     }
-                    if(y < minY){
+                    if (y < minY) {
                         minY = y;
                     }
 
-                   PointsGraphSeries<DataPoint> series3 = new PointsGraphSeries<>(new DataPoint[]{
-                        k
-                   });
+                    PointsGraphSeries<DataPoint> series3 = new PointsGraphSeries<>(new DataPoint[]{
+                            k
+                    });
 
-                   graphView.addSeries(series3);
-                   series3.setShape(PointsGraphSeries.Shape.POINT);
-                   series3.setColor(Color.RED);
-                   series3.setSize(4);
-               }
+                    graphView.addSeries(series3);
+                    series3.setShape(PointsGraphSeries.Shape.POINT);
+                    series3.setColor(Color.RED);
+                    series3.setSize(4);
+                }
                 graphView.getViewport().setMinY(minY);
                 graphView.getViewport().setMaxY(maxY);
 
                 break;
 
             case R.id.CancelButton:
-                final Intent callPaintIntent = new Intent(PaintActivity.this,MainActivity.class);
+                final Intent callPaintIntent = new Intent(PaintActivity.this, MainActivity.class);
                 startActivity(callPaintIntent);
-            break;
+                break;
 
         }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-            X = event.getX();
-            Y = event.getY();
-        switch (event.getAction()){
-                case MotionEvent.ACTION_DOWN:
+        X = event.getX();
+        Y = event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
 
-                    V id = new V();
-                    id.X = (float)((X/100)-0.25);
-                    id.Y = (float)((10-(Y/100)-0.25));
-                    mas.add(id);
-                    DataPoint a = new DataPoint((X/100)-0.25,(10-(Y/100)-0.25));
+                V id = new V();
+                id.X = (float) ((X / 100) - 0.25);
+                id.Y = (float) ((10 - (Y / 100) - 0.25));
+                mas.add(id);
+                DataPoint a = new DataPoint((X / 100) - 0.25, (10 - (Y / 100) - 0.25));
 
-                    PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(new DataPoint[] {
-                            a
-                    });
+                PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(new DataPoint[]{
+                        a
+                });
 
-                    graphView.addSeries(series);
-                    series.setShape(PointsGraphSeries.Shape.POINT);
-                    series.setColor(Color.BLACK);
-                    break;
-            }
+                graphView.addSeries(series);
+                series.setShape(PointsGraphSeries.Shape.POINT);
+                series.setColor(Color.BLACK);
+                break;
+        }
         return true;
     }
 
-    public float lagrange(V mas[], int n, double _x){
+    public float lagrange(V mas[], int n, double _x) {
 
         float result = 0.0f;
 
-        for(int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             double P = 1.0f;
-            for(int j = 0; j < n; j++)
-                if(i!= j)
-                    P *= (_x- mas[j].X)/(mas[i].X-mas[j].X);
+            for (int j = 0; j < n; j++)
+                if (i != j)
+                    P *= (_x - mas[j].X) / (mas[i].X - mas[j].X);
 
-                result += P*mas[i].Y;
+            result += P * mas[i].Y;
         }
         return result;
     }

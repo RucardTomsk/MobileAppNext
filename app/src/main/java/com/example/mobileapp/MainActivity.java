@@ -21,19 +21,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       editor = findViewById(R.id.editorButton);
-       editor.setOnClickListener(this);
+        editor = findViewById(R.id.editorButton);
+        editor.setOnClickListener(this);
 
-       paint = findViewById(R.id.paintButton);
-       paint.setOnClickListener(this);
+        paint = findViewById(R.id.paintButton);
+        paint.setOnClickListener(this);
 
-       cube = findViewById(R.id.cubeButton);
-       cube.setOnClickListener(this);
-   }
+        cube = findViewById(R.id.cubeButton);
+        cube.setOnClickListener(this);
+    }
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.editorButton:
                 final Intent editorIntent = new Intent(MainActivity.this, GraphicsEditorActivity.class);
                 startActivity(editorIntent);
